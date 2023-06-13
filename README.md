@@ -39,8 +39,8 @@ npm install @thirdweb-dev/react @xmtp/xmtp-js
 ```
 
 ```tsx
-//Thirdweb SDK
-When using client-side libraries, additional polyfills are required.
+//Thirdweb SDK Configuration
+//When using client-side libraries, additional polyfills are required.
 npm i assert stream -D
 //To ignore the sourcemap warnings, create a .env file with the following in your root directory:
 
