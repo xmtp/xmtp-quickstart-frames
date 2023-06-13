@@ -1,70 +1,148 @@
-# Getting Started with Create React App
+# Developer Quickstart
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+XMTP (Extensible Message Transport Protocol) is an open protocol and network for secure and private web3 messaging. For example, you can build an app with XMTP to send messages between blockchain accounts, including chat/DMs, alerts, announcements, and more.
 
-## Available Scripts
+### Demo App
 
-In the project directory, you can run:
+This repository demonstrates the implementation of these concepts within a simple chat app.
 
-### `npm start`
+[GitHub repo](https://github.com/fabriguespe/xmtp-quickstart-js)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```tsx
+git clone git@github.com:fabriguespe/xmtp-quickstart-js.git
+cd xmtp-quickstart-js
+npm install
+npm run dev
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Learning Objectives:
 
-### `npm test`
+- Setting up the ConnectWallet button
+- Signing in with XMTP
+- Loading a conversation
+- Sending a message
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Getting Started
 
-### `npm run build`
+The first step involves creating and configuring the Next.js application.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To generate a new Next.js app, execute the following command in your terminal:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```tsx
+npx create-react-app xmtp-quickstart-reactjs
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Next, navigate into the newly created directory and install the necessary dependencies for using XMTP and Thirdweb:
 
-### `npm run eject`
+```tsx
+npm install @thirdweb-dev/react @xmtp/xmtp-js
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+#### Thirdweb SDK
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+When using client-side libraries, additional polyfills are required.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```tsx
+npm i assert stream -D
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+To ignore the sourcemap warnings, create a .env file with the following in your root directory:
 
-## Learn More
+```bash
+GENERATE_SOURCEMAP=false
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Configuring the client
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+First we need to initialize XMTP client using as signer our wallet connection of choice.
 
-### Code Splitting
+```tsx
+import "./App.css";
+import Home from "./components/Home";
+import { ThirdwebProvider } from "@thirdweb-dev/react";
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+function App() {
+  return (
+    <ThirdwebProvider activeChain="goerli">
+      <Home />
+    </ThirdwebProvider>
+  );
+}
 
-### Analyzing the Bundle Size
+export default App;
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Display connect with XMTP
 
-### Making a Progressive Web App
+Now that we have the wrapper we can add a button that will sign our user in with XMTP.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```tsx
+{
+  isConnected && !isOnNetwork && (
+    <div className={styles.xmtp}>
+      <ConnectWallet theme="light" />
+      <button onClick={initXmtp} className={styles.btnXmtp}>
+        Connect to XMTP
+      </button>
+    </div>
+  );
+}
+```
 
-### Advanced Configuration
+```tsx
+// Function to initialize the XMTP client
+const initXmtp = async function () {
+  // Create the XMTP client
+  const xmtp = await Client.create(signer, { env: "production" });
+  //Create or load conversation with Gm bot
+  newConversation(xmtp, PEER_ADDRESS);
+  // Set the XMTP client in state for later use
+  setIsOnNetwork(!!xmtp.address);
+  //Set the client in the ref
+  clientRef.current = xmtp;
+};
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Load conversation and messages
 
-### Deployment
+Now using our hooks we are going to use the state to listen whan XMTP is connected.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Later we are going to load our conversations and we are going to simulate starting a conversation with one of our bots
 
-### `npm run build` fails to minify
+```tsx
+useEffect(() => {
+  if (isOnNetwork && convRef.current) {
+    // Function to stream new messages in the conversation
+    const streamMessages = async () => {
+      const newStream = await convRef.current.streamMessages();
+      for await (const msg of newStream) {
+        const exists = messages.find((m) => m.id === msg.id);
+        if (!exists) {
+          setMessages((prevMessages) => {
+            const msgsnew = [...prevMessages, msg];
+            return msgsnew;
+          });
+        }
+      }
+    };
+    streamMessages();
+  }
+}, [messages, isOnNetwork]);
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Listen to conversations
+
+In your component initialize the hook to listen to conversations
+
+```tsx
+const [history, setHistory] = useState(null);
+const { messages } = useMessages(conversation);
+// Stream messages
+const onMessage = useCallback((message) => {
+  setHistory((prevMessages) => {
+    const msgsnew = [...prevMessages, message];
+    return msgsnew;
+  });
+}, []);
+useStreamMessages(conversation, onMessage);
+```
