@@ -38,17 +38,14 @@ Next, navigate into the newly created directory and install the necessary depend
 npm install @thirdweb-dev/react @xmtp/xmtp-js
 ```
 
-\_**Warning:** Thirdweb SDK.\_
-
-When using client-side libraries, additional polyfills are required.
+\_**Warning:** .\_
 
 ```tsx
+//Thirdweb SDK
+When using client-side libraries, additional polyfills are required.
 npm i assert stream -D
-```
+//To ignore the sourcemap warnings, create a .env file with the following in your root directory:
 
-To ignore the sourcemap warnings, create a .env file with the following in your root directory:
-
-```bash
 GENERATE_SOURCEMAP=false
 ```
 
