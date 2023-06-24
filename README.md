@@ -38,7 +38,7 @@ Next, navigate into the newly created directory and install the necessary depend
 npm install @thirdweb-dev/react @xmtp/xmtp-js
 ```
 
-#### Trouble shooting
+##### Trouble shooting
 
 ##### Buffer polyfill
 
@@ -48,8 +48,6 @@ The Node Buffer API must be polyfilled in some cases. To do so, add the buffer d
 import { Buffer } from "buffer";
 window.Buffer = window.Buffer ?? Buffer;
 ```
-
-##### Thirdweb SDK Configuration
 
 ```tsx
 //When using client-side libraries, additional polyfills are required.
