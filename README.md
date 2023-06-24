@@ -40,6 +40,14 @@ npm install @thirdweb-dev/react @xmtp/xmtp-js
 
 ##### Trouble shooting
 
+```tsx
+//When using client-side libraries, additional polyfills are required.
+npm i assert stream -D
+//To ignore the sourcemap warnings, create a .env file with the following in your root directory:
+
+GENERATE_SOURCEMAP=false
+```
+
 ##### Buffer polyfill
 
 The Node Buffer API must be polyfilled in some cases. To do so, add the buffer dependency to your project and then polyfill it in your entry file.
@@ -47,14 +55,6 @@ The Node Buffer API must be polyfilled in some cases. To do so, add the buffer d
 ```tsx
 import { Buffer } from "buffer";
 window.Buffer = window.Buffer ?? Buffer;
-```
-
-```tsx
-//When using client-side libraries, additional polyfills are required.
-npm i assert stream -D
-//To ignore the sourcemap warnings, create a .env file with the following in your root directory:
-
-GENERATE_SOURCEMAP=false
 ```
 
 ### Configuring the client
