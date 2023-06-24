@@ -38,8 +38,20 @@ Next, navigate into the newly created directory and install the necessary depend
 npm install @thirdweb-dev/react @xmtp/xmtp-js
 ```
 
+#### Trouble shooting
+
+##### Buffer polyfill
+
+The Node Buffer API must be polyfilled in some cases. To do so, add the buffer dependency to your project and then polyfill it in your entry file.
+
 ```tsx
-//Thirdweb SDK Configuration
+import { Buffer } from "buffer";
+window.Buffer = window.Buffer ?? Buffer;
+```
+
+##### Thirdweb SDK Configuration
+
+```tsx
 //When using client-side libraries, additional polyfills are required.
 npm i assert stream -D
 //To ignore the sourcemap warnings, create a .env file with the following in your root directory:
