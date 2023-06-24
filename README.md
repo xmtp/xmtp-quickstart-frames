@@ -38,7 +38,7 @@ Next, navigate into the newly created directory and install the necessary depend
 npm install @thirdweb-dev/react @xmtp/xmtp-js
 ```
 
-##### Trouble shooting
+#### Trouble shooting
 
 ```tsx
 //When using client-side libraries, additional polyfills are required.
