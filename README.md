@@ -52,7 +52,7 @@ GENERATE_SOURCEMAP=false
 
 The Node Buffer API must be polyfilled in some cases. To do so, add the buffer dependency to your project and then polyfill it in your entry file.
 
-1. Create a polyfill.js file with the following code
+1. Create a `polyfills.js` file with the following code
 
 ```tsx
 import { Buffer } from "buffer";
