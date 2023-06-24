@@ -59,7 +59,7 @@ import { Buffer } from "buffer";
 window.Buffer = window.Buffer ?? Buffer;
 ```
 
-2. Insert it into your `index.js`on the first line
+2. Insert it into your `index.js` on the first line
 
 ```tsx
 import "./polyfills";
