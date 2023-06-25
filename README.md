@@ -6,11 +6,11 @@ XMTP (Extensible Message Transport Protocol) is an open protocol and network for
 
 This repository demonstrates the implementation of these concepts within a simple chat app.
 
-[GitHub repo](https://github.com/fabriguespe/xmtp-quickstart-js)
+[GitHub repo](https://github.com/fabriguespe/xmtp-quickstart-reactjs)
 
 ```tsx
-git clone git@github.com:fabriguespe/xmtp-quickstart-js.git
-cd xmtp-quickstart-js
+git clone git@github.com:fabriguespe/xmtp-quickstart-reactjs.git
+cd xmtp-quickstart-reactjs
 npm install
 npm run dev
 ```
