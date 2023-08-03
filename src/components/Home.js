@@ -84,7 +84,7 @@ export default function Home() {
     <div className={styles.Home}>
       {/* Display the ConnectWallet component if not connected */}
       {!isConnected && (
-        <div className={styles.thirdWeb}>
+        <div className={styles.dynamic}>
           <DynamicWidget />
         </div>
       )}
