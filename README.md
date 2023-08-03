@@ -32,10 +32,10 @@ To generate a new Next.js app, execute the following command in your terminal:
 npx create-react-app xmtp-quickstart-reactjs
 ```
 
-Next, navigate into the newly created directory and install the necessary dependencies for using XMTP and Thirdweb:
+Next, navigate into the newly created directory and install the necessary dependencies:
 
 ```tsx
-npm install @thirdweb-dev/react @xmtp/xmtp-js
+npm i @dynamic-labs/sdk-react-core @dynamic-labs/ethereum-all @xmtp/xmtp-js
 ```
 
 #### Trouble shooting
@@ -72,13 +72,19 @@ First we need to initialize XMTP client using as signer our wallet connection of
 ```tsx
 import "./App.css";
 import Home from "./components/Home";
-import { ThirdwebProvider } from "@thirdweb-dev/react";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum-all";
 
 function App() {
   return (
-    <ThirdwebProvider activeChain="goerli">
+    <DynamicContextProvider
+      settings={{
+        environmentId: "f0b977d0-b712-49f1-af89-2a24c47674da",
+        walletConnectors: [EthereumWalletConnectors],
+      }}
+    >
       <Home />
-    </ThirdwebProvider>
+    </DynamicContextProvider>
   );
 }
 
@@ -93,7 +99,7 @@ Now that we have the wrapper we can add a button that will sign our user in with
 {
   isConnected && !isOnNetwork && (
     <div className={styles.xmtp}>
-      <ConnectWallet theme="light" />
+      <DynamicWidget />
       <button onClick={initXmtp} className={styles.btnXmtp}>
         Connect to XMTP
       </button>
