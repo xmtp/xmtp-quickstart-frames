@@ -1,27 +1,27 @@
-
-.Home{
+.Home {
   background-color: white;
-  color:black
+  color: black;
 }
 
-.thirdWeb{
+.dynamic {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: black;
   height: 100vh;
+  --dynamic-hover: white;
 }
-.xmtp{
+.xmtp {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
 }
-.btnXmtp{
+.btnXmtp {
   all: unset;
-  background: hsl(300, 20.0%, 99.0%);
+  background: hsl(300, 20%, 99%);
   border: 1px solid hsl(278, 4.1%, 89.1%);
   cursor: pointer;
   padding: 12px 12px;

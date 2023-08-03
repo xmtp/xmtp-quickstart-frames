@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import styles from "./Chat.module.css";
-import { useAddress } from "@thirdweb-dev/react";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 function Chat({ client, messageHistory, conversation }) {
-  const address = useAddress();
+  const { primaryWallet } = useDynamicContext();
+  const address = primaryWallet?.address;
   const [inputValue, setInputValue] = useState("");
 
   // Function to handle sending a message

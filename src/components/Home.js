@@ -1,10 +1,9 @@
-import { ConnectWallet } from "@thirdweb-dev/react";
-import { useSigner } from "@thirdweb-dev/react";
 import { Client } from "@xmtp/xmtp-js";
 
 import React, { useEffect, useState, useRef } from "react";
 import Chat from "./Chat";
 import styles from "./Home.module.css";
+import { DynamicWidget, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 const PEER_ADDRESS = "0x937C0d4a6294cdfa575de17382c7076b579DC176";
 
@@ -12,8 +11,25 @@ export default function Home() {
   const [messages, setMessages] = useState(null);
   const convRef = useRef(null);
   const clientRef = useRef(null);
-  const signer = useSigner();
-  const isConnected = !!signer;
+  const [signer, setSigner] = useState(null);
+
+  const { primaryWallet } = useDynamicContext();
+
+  const isConnected = !!primaryWallet;
+
+  const getAndSetSigner = async () => {
+    const signer = await primaryWallet.connector.getSigner();
+    setSigner(signer);
+  };
+
+  useEffect(() => {
+    if (primaryWallet && !signer) {
+      getAndSetSigner();
+    } else if (!primaryWallet && signer) {
+      setSigner(null);
+    }
+  }, [primaryWallet]);
+
   const [isOnNetwork, setIsOnNetwork] = useState(false);
 
   // Function to load the existing messages in a conversation
@@ -68,19 +84,14 @@ export default function Home() {
     <div className={styles.Home}>
       {/* Display the ConnectWallet component if not connected */}
       {!isConnected && (
-        <div className={styles.thirdWeb}>
-          <img
-            src="thirdweb-logo-transparent-white.svg"
-            alt="Your image description"
-            width={200}
-          />
-          <ConnectWallet theme="dark" />
+        <div className={styles.dynamic}>
+          <DynamicWidget />
         </div>
       )}
       {/* Display XMTP connection options if connected but not initialized */}
       {isConnected && !isOnNetwork && (
         <div className={styles.xmtp}>
-          <ConnectWallet theme="light" />
+          <DynamicWidget />
           <button onClick={initXmtp} className={styles.btnXmtp}>
             Connect to XMTP
           </button>
