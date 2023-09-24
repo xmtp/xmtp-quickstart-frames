@@ -1,4 +1,4 @@
-# XMTP React Hooks Quickstart
+# ReactJS Quickstart
 
 ## Installation
 
@@ -9,7 +9,7 @@ bun start
 
 ## Concepts
 
-Head to our docs to understand our hooks concepts with our react SDK
+Head to our docs to understand our concepts with our react SDK
 
 - [Get started](https://xmtp.org/docs/build/get-started)
 - [Authentication](https://xmtp.org/docs/build/authentication)
