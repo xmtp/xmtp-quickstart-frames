@@ -1,167 +1,101 @@
-# Developer Quickstart
+# XMTP React Hooks Quickstart
 
-XMTP (Extensible Message Transport Protocol) is an open protocol and network for secure and private web3 messaging. For example, you can build an app with XMTP to send messages between blockchain accounts, including chat/DMs, alerts, announcements, and more.
+## Installation
 
-### Demo App
-
-This repository demonstrates the implementation of these concepts within a simple chat app.
-
-[GitHub repo](https://github.com/fabriguespe/xmtp-quickstart-reactjs)
-
-```tsx
-git clone git@github.com:fabriguespe/xmtp-quickstart-reactjs.git
-cd xmtp-quickstart-reactjs
-npm install
-npm run dev
+```bash
+bun install
+bun start
 ```
 
-### Learning Objectives:
+## Concepts
 
-- Setting up the ConnectWallet button
-- Signing in with XMTP
-- Loading a conversation
-- Sending a message
+Head to our docs to understand our hooks concepts with our react SDK
 
-### Getting Started
+- [Get started](https://xmtp.org/docs/build/get-started)
+- [Authentication](https://xmtp.org/docs/build/authentication)
+- [Conversations](https://xmtp.org/docs/build/conversations)
+- [Messages](https://xmtp.org/docs/build/messages/)
+- [Streams](https://xmtp.org/docs/build/streams/)
 
-The first step involves creating and configuring the Next.js application.
+#### Troubleshooting
 
-To generate a new Next.js app, execute the following command in your terminal:
+If you get into issues with `Buffer` and `polyfills` check out the fix below:
 
-```tsx
-npx create-react-app xmtp-quickstart-reactjs
+1. Install the buffer dependency.
+
+```bash
+npm i buffer
 ```
 
-Next, navigate into the newly created directory and install the necessary dependencies:
-
-```tsx
-npm i @dynamic-labs/sdk-react-core @dynamic-labs/ethereum-all @xmtp/xmtp-js
-```
-
-#### Trouble shooting
-
-```tsx
-//When using client-side libraries, additional polyfills are required.
-npm i assert stream -D
-//To ignore the sourcemap warnings, create a .env file with the following in your root directory:
-
-GENERATE_SOURCEMAP=false
-```
-
-##### Buffer polyfill
-
-The Node Buffer API must be polyfilled in some cases. To do so, add the buffer dependency to your project and then polyfill it in your entry file.
-
-1. Create a `polyfills.js` file with the following code
+2. Create a new file, `polyfills.js`, in the root of your project.
 
 ```tsx
 import { Buffer } from "buffer";
+
 window.Buffer = window.Buffer ?? Buffer;
 ```
 
-2. Insert it into your `index.js` on the first line
+3. Import it into your main file on the first line.
+
+- ReacJS: `index.js` or `index.tsx`
+- VueJS: `main.js`
+- NuxtJS: `app.vue`
+
+  <br/>
 
 ```tsx
+//has to be on the first line of the file for it to work
 import "./polyfills";
 ```
 
-### Configuring the client
+4. Update config files.
 
-First we need to initialize XMTP client using as signer our wallet connection of choice.
+- Webpack: `vue.config.js` or `webpack.config.js`:
 
-```tsx
-import "./App.css";
-import Home from "./components/Home";
-import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
-import { EthereumWalletConnectors } from "@dynamic-labs/ethereum-all";
+```jsx
+const webpack = require("webpack");
 
-function App() {
-  return (
-    <DynamicContextProvider
-      settings={{
-        environmentId: "f0b977d0-b712-49f1-af89-2a24c47674da",
-        walletConnectors: [EthereumWalletConnectors],
-      }}
-    >
-      <Home />
-    </DynamicContextProvider>
-  );
-}
-
-export default App;
-```
-
-### Display connect with XMTP
-
-Now that we have the wrapper we can add a button that will sign our user in with XMTP.
-
-```tsx
-{
-  isConnected && !isOnNetwork && (
-    <div className={styles.xmtp}>
-      <DynamicWidget />
-      <button onClick={initXmtp} className={styles.btnXmtp}>
-        Connect to XMTP
-      </button>
-    </div>
-  );
-}
-```
-
-```tsx
-// Function to initialize the XMTP client
-const initXmtp = async function () {
-  // Create the XMTP client
-  const xmtp = await Client.create(signer, { env: "production" });
-  //Create or load conversation with Gm bot
-  newConversation(xmtp, PEER_ADDRESS);
-  // Set the XMTP client in state for later use
-  setIsOnNetwork(!!xmtp.address);
-  //Set the client in the ref
-  clientRef.current = xmtp;
+module.exports = {
+  configureWebpack: {
+    plugins: [
+      new webpack.ProvidePlugin({
+        Buffer: ["buffer", "Buffer"],
+      }),
+    ],
+  },
+  transpileDependencies: true,
 };
 ```
 
-### Load conversation and messages
+- Vite: `vite.config.js`:
 
-Now using our hooks we are going to use the state to listen whan XMTP is connected.
+```jsx
+import { defineConfig } from "vite";
+import { Buffer } from "buffer";
 
-Later we are going to load our conversations and we are going to simulate starting a conversation with one of our bots
-
-```tsx
-useEffect(() => {
-  if (isOnNetwork && convRef.current) {
-    // Function to stream new messages in the conversation
-    const streamMessages = async () => {
-      const newStream = await convRef.current.streamMessages();
-      for await (const msg of newStream) {
-        const exists = messages.find((m) => m.id === msg.id);
-        if (!exists) {
-          setMessages((prevMessages) => {
-            const msgsnew = [...prevMessages, msg];
-            return msgsnew;
-          });
-        }
-      }
-    };
-    streamMessages();
-  }
-}, [messages, isOnNetwork]);
+export default defineConfig({
+  /**/
+  define: {
+    global: {
+      Buffer: Buffer,
+    },
+  },
+  /**/
+});
 ```
 
-### Listen to conversations
-
-In your component initialize the hook to listen to conversations
+- NuxtJS: `nuxt.config.js`:
 
 ```tsx
-const [history, setHistory] = useState(null);
-const { messages } = useMessages(conversation);
-// Stream messages
-const onMessage = useCallback((message) => {
-  setHistory((prevMessages) => {
-    const msgsnew = [...prevMessages, message];
-    return msgsnew;
-  });
-}, []);
-useStreamMessages(conversation, onMessage);
+export default {
+  build: {
+    extend(config, { isClient }) {
+      if (isClient) {
+        config.node = {
+          Buffer: true,
+        };
+      }
+    },
+  },
+};
 ```
