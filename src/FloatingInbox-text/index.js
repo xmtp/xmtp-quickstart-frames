@@ -152,7 +152,7 @@ export function FloatingInbox({
   }, [isOpen, isConnected, isOnNetwork]);
 
   const connectWallet = async () => {
-    if (typeof window.ethereum !== "undefined") {
+    if (typeof window.ethereum !== undefined) {
       try {
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -201,7 +201,7 @@ export function FloatingInbox({
     setIsOpen(false);
   };
 
-  if (typeof window !== "undefined") {
+  if (typeof window !== undefined) {
     window.FloatingInbox = {
       open: openWidget,
       close: closeWidget,
@@ -264,16 +264,14 @@ export function FloatingInbox({
             "FloatingInbox " +
             (isOpen ? "spin-clockwise" : "spin-counter-clockwise")
           }
-          style={styles.FloatingLogo}
-        >
+          style={styles.FloatingLogo}>
           💬
         </div>
       )}
       {isOpen && (
         <div
           style={styles.uContainer}
-          className={" " + (isOnNetwork ? "expanded" : "")}
-        >
+          className={" " + (isOnNetwork ? "expanded" : "")}>
           {isConnected && (
             <button style={styles.logoutBtn} onClick={handleLogout}>
               Logout
@@ -287,8 +285,7 @@ export function FloatingInbox({
                     style={styles.backButton}
                     onClick={() => {
                       setSelectedConversation(null);
-                    }}
-                  >
+                    }}>
                     ←
                   </button>
                 )}
@@ -341,7 +338,7 @@ const ENCODING = "binary";
 
 export const getEnv = () => {
   // "dev" | "production" | "local"
-  return typeof process !== "undefined" && process.env.REACT_APP_XMTP_ENV
+  return typeof process !== undefined && process.env.REACT_APP_XMTP_ENV
     ? process.env.REACT_APP_XMTP_ENV
     : "production";
 };
@@ -357,7 +354,7 @@ export const loadKeys = (walletAddress) => {
 export const storeKeys = (walletAddress, keys) => {
   localStorage.setItem(
     buildLocalStorageKey(walletAddress),
-    Buffer.from(keys).toString(ENCODING)
+    Buffer.from(keys).toString(ENCODING),
   );
 };
 
