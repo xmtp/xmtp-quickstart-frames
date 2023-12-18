@@ -152,7 +152,7 @@ export function FloatingInbox({
   }, [isOpen, isConnected, isOnNetwork]);
 
   const connectWallet = async () => {
-    if (typeof window.ethereum !== undefined) {
+    if (typeof window.ethereum !== "undefined") {
       try {
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -201,7 +201,7 @@ export function FloatingInbox({
     setIsOpen(false);
   };
 
-  if (typeof window !== undefined) {
+  if (typeof window !== "undefined") {
     window.FloatingInbox = {
       open: openWidget,
       close: closeWidget,
@@ -338,7 +338,7 @@ const ENCODING = "binary";
 
 export const getEnv = () => {
   // "dev" | "production" | "local"
-  return typeof process !== undefined && process.env.REACT_APP_XMTP_ENV
+  return typeof process !== "undefined" && process.env.REACT_APP_XMTP_ENV
     ? process.env.REACT_APP_XMTP_ENV
     : "production";
 };
