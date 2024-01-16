@@ -16,3 +16,9 @@ Head to our docs to understand our hooks concepts with our react SDK
 - [Conversations](https://xmtp.org/docs/build/conversations?sdk=js)
 - [Messages](https://xmtp.org/docs/build/messages/?sdk=js)
 - [Streams](https://xmtp.org/docs/build/streams/?sdk=js)
+
+#### Troubleshooting
+
+If you get into issues with `Buffer` and `polyfills` check out the fix below:
+
+- [Check out Buffer issue](https://github.com/xmtp/xmtp-js/issues/487)
