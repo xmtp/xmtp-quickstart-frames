@@ -170,11 +170,12 @@ export function FloatingInbox({
 
   const getAddress = async (signer) => {
     try {
+      //ethers
       if (signer && typeof signer.getAddress === "function") {
         return await signer.getAddress();
       }
-      if (signer && typeof signer.getAddresses === "function") {
-        //viem
+      //viem
+      else if (signer && typeof signer.getAddresses === "function") {
         const [address] = await signer.getAddresses();
         return address;
       }
@@ -183,6 +184,7 @@ export function FloatingInbox({
       console.log(e);
     }
   };
+
   const [isWalletCreated, setIsWalletCreated] = useState(false);
 
   const createNewWallet = async () => {

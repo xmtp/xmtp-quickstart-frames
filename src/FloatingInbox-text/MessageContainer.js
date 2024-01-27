@@ -15,7 +15,7 @@ export const MessageContainer = ({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const [showPopup, setShowPopup] = useState(
-    conversation.consentState === "unknown"
+    conversation.consentState === "unknown",
   );
 
   const styles = {
@@ -68,7 +68,7 @@ export const MessageContainer = ({
 
   const updateMessages = (prevMessages, newMessage) => {
     const doesMessageExist = prevMessages.some(
-      (existingMessage) => existingMessage.id === newMessage.id
+      (existingMessage) => existingMessage.id === newMessage.id,
     );
 
     if (!doesMessageExist) {
@@ -124,6 +124,7 @@ export const MessageContainer = ({
   const startMessageStream = async () => {
     let stream = await conversation.streamMessages();
     for await (const message of stream) {
+      console.log(message.senderAddress, message.content);
       setMessages((prevMessages) => {
         return updateMessages(prevMessages, message);
       });
@@ -181,14 +182,12 @@ export const MessageContainer = ({
               <div style={styles.popupInner}>
                 <button
                   style={{ ...styles.popupButton, ...styles.acceptButton }}
-                  onClick={handleAccept}
-                >
+                  onClick={handleAccept}>
                   Accept
                 </button>
                 <button
                   style={{ ...styles.popupButton, ...styles.blockButton }}
-                  onClick={handleBlock}
-                >
+                  onClick={handleBlock}>
                   Block
                 </button>
               </div>
