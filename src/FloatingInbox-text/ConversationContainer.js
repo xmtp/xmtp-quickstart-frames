@@ -174,6 +174,7 @@ export const ConversationContainer = ({
               searchTerm={searchTerm}
               selectConversation={setSelectedConversation}
               onConversationFound={(state) => {
+                console.log("onConversationFound", state);
                 setConversationFound(state);
                 if (state === true) setCreateNew(false);
               }}
@@ -185,13 +186,14 @@ export const ConversationContainer = ({
               searchTerm={searchTerm}
               selectConversation={setSelectedConversation}
               onConversationFound={(state) => {
+                console.log("onConversationFound", state);
                 setConversationFound(state);
                 if (state === true) setCreateNew(false);
               }}
             />
           )}
           {message && conversationFound !== true && <small>{message}</small>}
-          {peerAddress && createNew && (
+          {peerAddress && createNew && !conversationFound && (
             <button
               style={styles.createNewButton}
               onClick={() => {

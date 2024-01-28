@@ -1,20 +1,34 @@
 import React from "react";
 
 export const MessageItem = ({ message, senderAddress, client }) => {
+  const renderFooter = (timestamp) => {
+    return (
+      <div style={styles.footer}>
+        <span style={styles.timeStamp}>
+          {`${new Date(timestamp).getHours()}:${String(
+            new Date(timestamp).getMinutes(),
+          ).padStart(2, "0")}`}
+        </span>
+      </div>
+    );
+  };
+
   const renderMessage = (message) => {
-    try {
-      if (message?.content.length > 0) {
-        return <div style={styles.renderedMessage}>{message?.content}</div>;
-      }
-    } catch {
-      return message?.fallbackContent ? (
-        message?.fallbackContent
-      ) : message?.contentFallback ? (
-        message?.contentFallback
-      ) : (
-        <div style={styles.renderedMessage}>{message?.content}</div>
-      );
+    const codec = client.codecFor(message.contentType);
+    console.log("codecs", message.contentType.typeId, codec, message.id);
+    let content = message.content;
+    if (!codec) {
+      /*Not supported content type*/
+      if (message?.contentFallback !== undefined)
+        content = message?.contentFallback;
+      else return;
     }
+    return (
+      <div style={styles.messageContent}>
+        <div style={styles.renderedMessage}>{content}</div>
+        {renderFooter(message.sent)}
+      </div>
+    );
   };
 
   const isSender = senderAddress === client?.address;
@@ -24,18 +38,8 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   return (
     <MessageComponent
       style={isSender ? styles.senderMessage : styles.receiverMessage}
-      key={message.id}
-    >
-      <div style={styles.messageContent}>
-        {renderMessage(message)}
-        <div style={styles.footer}>
-          <span style={styles.timeStamp}>
-            {`${new Date(message.sent).getHours()}:${String(
-              new Date(message.sent).getMinutes()
-            ).padStart(2, "0")}`}
-          </span>
-        </div>
-      </div>
+      key={message.id}>
+      {renderMessage(message)}
     </MessageComponent>
   );
 };

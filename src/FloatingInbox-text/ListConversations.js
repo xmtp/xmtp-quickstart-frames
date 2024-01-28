@@ -104,6 +104,12 @@ export const ListConversations = ({
         .includes(searchTerm.toLowerCase()) &&
       conversation?.peerAddress !== client.address,
   );
+
+  useEffect(() => {
+    if (filteredConversations.length > 0) {
+      onConversationFound(true);
+    }
+  }, [filteredConversations, onConversationFound]);
   return (
     <>
       {filteredConversations.map((conversation, index) => (
