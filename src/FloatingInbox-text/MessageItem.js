@@ -15,7 +15,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
 
   const renderMessage = (message) => {
     const codec = client.codecFor(message.contentType);
-    console.log("codecs", message.contentType.typeId, codec, message.id);
     let content = message.content;
     if (!codec) {
       /*Not supported content type*/
