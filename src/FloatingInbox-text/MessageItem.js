@@ -14,6 +14,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   };
 
   const renderMessage = (message) => {
+    console.log("message", message);
     const codec = client.codecFor(message.contentType);
     let content = message.content;
     if (!codec) {

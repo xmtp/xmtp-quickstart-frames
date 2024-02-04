@@ -10,7 +10,6 @@ export const MessageContainer = ({
   selectConversation,
   isConsent = false,
 }) => {
-  const isFirstLoad = useRef(true);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -80,10 +79,14 @@ export const MessageContainer = ({
 
   useEffect(() => {
     const fetchMessages = async () => {
-      if (conversation && conversation.peerAddress && isFirstLoad.current) {
+      if (conversation && conversation.peerAddress) {
         setIsLoading(true);
         const initialMessages = await conversation?.messages();
-
+        console.log(
+          "initialMessages",
+          conversation.peerAddress,
+          initialMessages,
+        );
         let updatedMessages = [];
         initialMessages.forEach((message) => {
           updatedMessages = updateMessages(updatedMessages, message);
@@ -91,7 +94,6 @@ export const MessageContainer = ({
 
         setMessages(updatedMessages);
         setIsLoading(false);
-        isFirstLoad.current = false;
       }
     };
 
@@ -151,9 +153,10 @@ export const MessageContainer = ({
     if (conversation && conversation.peerAddress) {
       await conversation.send(newMessage);
     } else if (conversation) {
+      console.log("entra");
       const conv = await client.conversations.newConversation(searchTerm);
-      selectConversation(conv);
       await conv.send(newMessage);
+      selectConversation(conv);
     }
   };
 
