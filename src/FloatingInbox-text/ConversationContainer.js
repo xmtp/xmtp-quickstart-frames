@@ -74,10 +74,19 @@ export const ConversationContainer = ({
       justifyContent: "space-between",
     },
     createNewButton: {
+      display: "block",
       border: "1px",
       padding: "5px",
       borderRadius: "5px",
       marginTop: "10px",
+      textAlign: "center",
+      backgroundColor: "#f0f0f0",
+      margin: "0 auto",
+      fontSize: "14px",
+    },
+    messageClass: {
+      textAlign: "center",
+      display: "block",
     },
     peerAddressInput: {
       width: "100%",
@@ -192,7 +201,9 @@ export const ConversationContainer = ({
               }}
             />
           )}
-          {message && conversationFound !== true && <small>{message}</small>}
+          {message && conversationFound !== true && (
+            <small style={styles.messageClass}>{message}</small>
+          )}
           {peerAddress && createNew && !conversationFound && (
             <button
               style={styles.createNewButton}
