@@ -243,8 +243,6 @@ export function FloatingInbox({
     if (!keys && !browserSupportSnaps) {
       keys = await Client.getKeys(signer, {
         ...clientOptions,
-        skipContactPublishing: true,
-        persistConversations: false,
       });
       storeKeys(address, keys);
     }
