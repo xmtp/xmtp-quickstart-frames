@@ -232,10 +232,15 @@ export function FloatingInbox({
     }
     let address = await getAddress(signer);
     let keys = loadKeys(address);
+
+    const browserSupportSnaps = window.ethereum?.isMetaMask
+      ? await Client.isSnapsReady()
+      : false;
     const clientOptions = {
       env: env ? env : getEnv(),
+      useSnaps: browserSupportSnaps,
     };
-    if (!keys) {
+    if (!keys && !browserSupportSnaps) {
       keys = await Client.getKeys(signer, {
         ...clientOptions,
         skipContactPublishing: true,
@@ -243,11 +248,11 @@ export function FloatingInbox({
       });
       storeKeys(address, keys);
     }
-    const xmtp = await Client.create(null, {
+    keys = browserSupportSnaps ? keys : undefined;
+    const signerToUse = browserSupportSnaps ? signer : null;
+    const xmtp = await Client.create(signerToUse, {
       ...clientOptions,
       privateKeyOverride: keys,
-      useSnap: true,
-      //Cosent enabled by default
     });
     setClient(xmtp);
     setIsOnNetwork(!!xmtp.address);
