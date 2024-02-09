@@ -224,7 +224,6 @@ export function FloatingInbox({
       onLogout();
     }
   };
-
   const initXmtpWithKeys = async function () {
     if (!signer) {
       handleLogout();
@@ -232,23 +231,18 @@ export function FloatingInbox({
     }
     let address = await getAddress(signer);
     let keys = loadKeys(address);
-
-    const browserSupportSnaps = window.ethereum?.isMetaMask
-      ? await Client.isSnapsReady()
-      : false;
     const clientOptions = {
       env: env ? env : getEnv(),
-      useSnaps: browserSupportSnaps,
     };
-    if (!keys && !browserSupportSnaps) {
+    if (!keys) {
       keys = await Client.getKeys(signer, {
         ...clientOptions,
+        skipContactPublishing: true,
+        persistConversations: false,
       });
       storeKeys(address, keys);
     }
-    keys = browserSupportSnaps ? keys : undefined;
-    const signerToUse = browserSupportSnaps ? signer : null;
-    const xmtp = await Client.create(signerToUse, {
+    const xmtp = await Client.create(null, {
       ...clientOptions,
       privateKeyOverride: keys,
     });
