@@ -7,6 +7,6 @@ import "./index.css";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <InboxPage />
+    <InboxPage isPWA={window.innerWidth <= 700} />
   </React.StrictMode>,
 );

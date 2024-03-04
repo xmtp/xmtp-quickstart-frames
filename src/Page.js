@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FloatingInbox } from "./FloatingInbox-text";
 import { ethers } from "ethers";
-
-const InboxPage = () => {
+const InboxPage = ({ isPWA = false }) => {
   const [signer, setSigner] = useState(null);
   const [walletConnected, setWalletConnected] = useState(false); // Add state for wallet connection
 
@@ -103,41 +102,49 @@ const InboxPage = () => {
   }, []);
 
   return (
-    <div style={styles.HomePageWrapperStyle}>
-      <button
-        className="home-button"
-        style={{ ...styles.ButtonStyledStyle, marginLeft: 10 }}
-        onClick={() => connectWallet()}>
-        {walletConnected ? "Connected" : "Connect Wallet"}
-      </button>
-      {walletConnected && (
-        <button
-          className="home-button"
-          style={{ ...styles.ButtonStyledStyle, marginLeft: 10 }}
-          onClick={() => disconnectWallet()}>
-          Logout
-        </button>
+    <>
+      {!isPWA && (
+        <div style={styles.HomePageWrapperStyle}>
+          <button
+            className="home-button"
+            style={{ ...styles.ButtonStyledStyle, marginLeft: 10 }}
+            onClick={() => connectWallet()}>
+            {walletConnected ? "Connected" : "Connect Wallet"}
+          </button>
+          {walletConnected && (
+            <button
+              className="home-button"
+              style={{ ...styles.ButtonStyledStyle, marginLeft: 10 }}
+              onClick={() => disconnectWallet()}>
+              Logout
+            </button>
+          )}
+          <h1>Quickstart Inbox </h1>
+          <span>See in mobile for a mobile layout</span>
+
+          <section className="App-section">
+            <button
+              className="home-button"
+              style={styles.ButtonStyledStyle}
+              onClick={() => window.FloatingInbox.open()}>
+              Open
+            </button>
+            <button
+              className="home-button"
+              style={{ ...styles.ButtonStyledStyle, marginLeft: 10 }}
+              onClick={() => window.FloatingInbox.close()}>
+              Close
+            </button>
+          </section>
+        </div>
       )}
-      <h1>Floating Inbox </h1>
 
-      <section className="App-section">
-        <button
-          className="home-button"
-          style={styles.ButtonStyledStyle}
-          onClick={() => window.FloatingInbox.open()}>
-          Open
-        </button>
-        <button
-          className="home-button"
-          style={{ ...styles.ButtonStyledStyle, marginLeft: 10 }}
-          onClick={() => window.FloatingInbox.close()}>
-          Close
-        </button>
-      </section>
-
-      <FloatingInbox env={process.env.REACT_APP_XMTP_ENV} wallet={signer} />
-    </div>
+      <FloatingInbox
+        env={process.env.REACT_APP_XMTP_ENV}
+        wallet={signer}
+        isPWA={isPWA}
+      />
+    </>
   );
 };
-
 export default InboxPage;
