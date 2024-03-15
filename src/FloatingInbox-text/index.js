@@ -104,7 +104,7 @@ export function FloatingInbox({
     conversationHeaderH4: {
       margin: "0px",
       padding: "4px",
-      fontSize: isPWA == true ? "16px" : "12px", // Increased font size
+      fontSize: isPWA == true ? "14px" : "12px", // Increased font size
     },
     backButton: {
       border: "0px",
@@ -303,7 +303,7 @@ export function FloatingInbox({
           {isConnected && isOnNetwork && (
             <div style={styles.widgetHeader}>
               <div style={styles.conversationHeader}>
-                {isOnNetwork && selectedConversation && (
+                {isOnNetwork && selectedConversation && !isFullScreen && (
                   <button
                     style={styles.backButton}
                     onClick={() => {
@@ -312,7 +312,6 @@ export function FloatingInbox({
                     ←
                   </button>
                 )}
-
                 <h4 style={styles.conversationHeaderH4}>Conversations</h4>
               </div>
             </div>
@@ -365,7 +364,7 @@ export function FloatingInbox({
             )}
             {isConnected && isOnNetwork && client && isFullScreen && (
               <div style={{ display: "flex", height: "100%" }}>
-                <div style={{ flex: 1, overflowY: "auto" }}>
+                <div style={{ flex: 1, overflowY: "auto", maxWidth: "350px" }}>
                   <ConversationContainer
                     isPWA={isPWA}
                     client={client}
@@ -377,7 +376,7 @@ export function FloatingInbox({
                   />
                 </div>
                 <div style={{ flex: 2, overflowY: "auto" }}>
-                  {selectedConversation?.id}
+                  {selectedConversation?.id}{" "}
                   {selectedConversation && (
                     <MessageContainer
                       client={client}

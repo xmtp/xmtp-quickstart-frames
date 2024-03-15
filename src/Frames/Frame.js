@@ -14,8 +14,14 @@ const styles = {
     backgroundColor: "white",
     border: "0px",
   },
+  imageFrameA: {
+    maxWidth: "300px",
+    bottom: "0",
+    right: "0",
+    display: "block",
+  },
   imageFrame: {
-    width: "200px",
+    width: "100%",
     bottom: "0",
     right: "0",
   },
@@ -23,7 +29,7 @@ const styles = {
     marginLeft: "5px", // Space between the button label and the icon
   },
   textInput: {
-    width: "80%",
+    width: "calc(100% - 8px)", // Adjusted to match the buttonRow width considering the marginRight
     outline: "none",
     boxShadow: "none",
   },
@@ -105,10 +111,15 @@ export const Frame = ({
   interactionsEnabled,
   textInput,
   onTextInputChange,
+  frameUrl,
 }) => {
   return (
     <>
-      <a href={""} target="_blank" rel="noopener noreferrer">
+      <a
+        href={frameUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={styles.imageFrameA}>
         <img src={image} alt={title} style={styles.imageFrame} />
       </a>
       {interactionsEnabled && (
