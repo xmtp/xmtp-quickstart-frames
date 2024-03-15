@@ -95,6 +95,25 @@ export const ListConversations = ({
     };
   }, []);
 
+  useEffect(() => {
+    const path = window.location.pathname;
+    const match = path.match(/\/dm\/(0x[a-fA-F0-9]{40})/); // Adjust regex as needed
+    if (match) {
+      const address = match[1];
+      // Logic to find and select the conversation based on the address
+      // For example:
+      console.log("Selecting conversation with address", address);
+      const conversationToSelect = conversations.find(
+        (conv) => conv.peerAddress === address,
+      );
+      if (conversationToSelect) {
+        selectConversation(conversationToSelect);
+      } else {
+        console.log("No conversation found with address:", address);
+      }
+    }
+  }, [conversations]);
+
   const filteredConversations = conversations.filter(
     (conversation) =>
       conversation?.peerAddress

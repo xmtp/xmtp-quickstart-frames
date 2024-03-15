@@ -189,17 +189,6 @@ export function FloatingInbox({
       console.error("Metamask not found");
     }
   };
-  useEffect(() => {
-    const path = window.location.pathname;
-    const match = path.match(/\/dm\/(0x[a-fA-F0-9]{40})/); // Adjust regex as needed
-    if (match) {
-      const address = match[1];
-      // Logic to find and select the conversation based on the address
-      // For example:
-      console.log("Selecting conversation with address", address);
-      // selectConversationByAddress(address);
-    }
-  }, []);
 
   const getAddress = async (signer) => {
     try {

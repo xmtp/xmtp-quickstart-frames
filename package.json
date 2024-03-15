@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "private": true,
   "dependencies": {
+    "@xmtp/frames-client": "^0.4.3",
     "@xmtp/xmtp-js": "^11.4.1",
     "axios": "^1.5.0",
     "buffer": "^6.0.3",

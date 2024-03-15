@@ -9,6 +9,7 @@ export const MessageContainer = ({
   isContained = false,
   selectConversation,
   isConsent = false,
+  isFullScreen = false,
 }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,12 +21,24 @@ export const MessageContainer = ({
   const styles = {
     loadingText: {
       textAlign: "center",
+      fontSize: "12px",
     },
     messagesContainer: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
       height: "100%",
+    },
+    peerAddressContainer: {
+      textAlign: "right",
+      width: "100%",
+      borderBottom: "1px solid lightgrey",
+      padding: "0px",
+      margin: "2px",
+    },
+    peerAddressContainerP: {
+      margin: "0px",
+      fontSize: "12px",
     },
     messagesList: {
       paddingLeft: "5px",
@@ -82,11 +95,7 @@ export const MessageContainer = ({
       if (conversation && conversation.peerAddress) {
         setIsLoading(true);
         const initialMessages = await conversation?.messages();
-        console.log(
-          "initialMessages",
-          conversation.peerAddress,
-          initialMessages,
-        );
+
         let updatedMessages = [];
         initialMessages.forEach((message) => {
           updatedMessages = updateMessages(updatedMessages, message);
@@ -167,6 +176,13 @@ export const MessageContainer = ({
       ) : (
         <>
           <ul style={styles.messagesList}>
+            {isFullScreen && (
+              <div style={styles.peerAddressContainer}>
+                <p style={styles.peerAddressContainerP}>
+                  Chatting with: {conversation.peerAddress}
+                </p>
+              </div>
+            )}
             {messages.slice().map((message) => {
               return (
                 <MessageItem
