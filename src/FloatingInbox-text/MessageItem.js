@@ -62,6 +62,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     setTextInputValue(event.target.value);
   }
   const conversationTopic = message.contentTopic;
+
   const handleFrameButtonClick = async (buttonIndex, action = "post") => {
     console.log(buttonIndex, action);
     if (!frameMetadata || !client || !frameMetadata?.frameInfo?.buttons) {
@@ -72,8 +73,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       return;
     }
     const button = frameInfo.buttons[buttonIndex];
-    console.log(buttonIndex, frameInfo.buttons[buttonIndex]);
-
     setFrameButtonUpdating(buttonIndex);
     const framesClient = new FramesClient(client);
     const postUrl = button.target || frameInfo.postUrl || frameUrl;
@@ -164,7 +163,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   };
 
   const isSender = senderAddress === client?.address;
-
   const showFrame = isValidFrame(frameMetadata);
 
   return (
@@ -184,6 +182,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
             interactionsEnabled={isXmtpFrame(frameMetadata)}
             textInput={frameMetadata?.frameInfo?.textInput?.content}
             onTextInputChange={onTextInputChange}
+            frameUrl={frameMetadata?.url} // Add this line to pass the frame URL
           />
         </div>
       )}
