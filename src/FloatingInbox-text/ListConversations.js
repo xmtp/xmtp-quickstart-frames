@@ -100,8 +100,6 @@ export const ListConversations = ({
     const match = path.match(/\/dm\/(0x[a-fA-F0-9]{40})/); // Adjust regex as needed
     if (match) {
       const address = match[1];
-      // Logic to find and select the conversation based on the address
-      // For example:
       console.log("Selecting conversation with address", address);
       const conversationToSelect = conversations.find(
         (conv) => conv.peerAddress === address,
@@ -111,8 +109,11 @@ export const ListConversations = ({
       } else {
         console.log("No conversation found with address:", address);
       }
+    } else if (conversations.length > 0) {
+      // If no deep linking match, select the first conversation
+      selectConversation(conversations[0]);
     }
-  }, [conversations]);
+  }, [conversations, selectConversation]);
 
   const filteredConversations = conversations.filter(
     (conversation) =>
