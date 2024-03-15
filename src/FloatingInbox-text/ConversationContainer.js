@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ethers } from "ethers";
-import { MessageContainer } from "./MessageContainer";
 import { ListConversations } from "./ListConversations";
 import { ListConversations as ListConversationsConsent } from "./ListConversations-consent";
+import { MessageContainer } from "./MessageContainer";
 
 export const ConversationContainer = ({
   client,
   selectedConversation,
   setSelectedConversation,
+  isFullScreen = false,
   isContained = false,
   isPWA = false,
   isConsent = false,
@@ -164,81 +165,79 @@ export const ConversationContainer = ({
       <div style={{ textAlign: "center", fontSize: "small" }}>Loading...</div>
     );
   }
+
+  const renderListConversations = () => {
+    return (
+      <ul style={styles.conversationList}>
+        <input
+          type="text"
+          placeholder="Enter a 0x wallet or ENS address"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          style={styles.peerAddressInput}
+        />
+        {loadingResolve && searchTerm && <small>Resolving address...</small>}
+        {isConsent ? (
+          <ListConversationsConsent
+            isPWA={isPWA}
+            client={client}
+            searchTerm={searchTerm}
+            selectConversation={setSelectedConversation}
+            onConversationFound={(state) => {
+              console.log("onConversationFound", state);
+              setConversationFound(state);
+              if (state === true) setCreateNew(false);
+            }}
+          />
+        ) : (
+          <ListConversations
+            isPWA={isPWA}
+            client={client}
+            searchTerm={searchTerm}
+            selectConversation={setSelectedConversation}
+            onConversationFound={(state) => {
+              console.log("onConversationFound", state);
+              setConversationFound(state);
+              if (state === true) setCreateNew(false);
+            }}
+          />
+        )}
+        {message && conversationFound !== true && (
+          <small style={styles.messageClass}>{message}</small>
+        )}
+        {peerAddress && createNew && !conversationFound && (
+          <button
+            style={styles.createNewButton}
+            onClick={() => {
+              setSelectedConversation({ messages: [] });
+            }}>
+            Create new conversation
+          </button>
+        )}
+      </ul>
+    );
+  };
+
   return (
     <div style={styles.conversations}>
-      {!selectedConversation && (
-        <ul style={styles.conversationList}>
-          <input
-            type="text"
-            placeholder="Enter a 0x wallet or ENS address"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            style={styles.peerAddressInput}
-          />
-          {loadingResolve && searchTerm && <small>Resolving address...</small>}
-          {isConsent ? (
-            <ListConversationsConsent
-              isPWA={isPWA}
-              client={client}
-              searchTerm={searchTerm}
-              selectConversation={setSelectedConversation}
-              onConversationFound={(state) => {
-                console.log("onConversationFound", state);
-                setConversationFound(state);
-                if (state === true) setCreateNew(false);
-              }}
-            />
+      {isFullScreen ? (
+        renderListConversations()
+      ) : (
+        <>
+          {!selectedConversation ? (
+            renderListConversations()
           ) : (
-            <ListConversations
-              isPWA={isPWA}
+            <MessageContainer
               client={client}
+              isContained={isContained}
+              conversation={selectedConversation}
               searchTerm={searchTerm}
-              selectConversation={setSelectedConversation}
-              onConversationFound={(state) => {
-                console.log("onConversationFound", state);
-                setConversationFound(state);
-                if (state === true) setCreateNew(false);
-              }}
+              isConsent={isConsent}
+              selectConversation={selectConversation}
             />
           )}
-          {message && conversationFound !== true && (
-            <small style={styles.messageClass}>{message}</small>
-          )}
-          {peerAddress && createNew && !conversationFound && (
-            <button
-              style={styles.createNewButton}
-              onClick={() => {
-                setSelectedConversation({ messages: [] });
-              }}>
-              Create new conversation
-            </button>
-          )}
-        </ul>
-      )}
-      {selectedConversation && (
-        <MessageContainer
-          client={client}
-          isContained={isContained}
-          conversation={selectedConversation}
-          searchTerm={searchTerm}
-          isConsent={isConsent}
-          selectConversation={selectConversation}
-        />
+        </>
       )}
     </div>
   );
-};
-
-const getRelativeTimeLabel = (dateString) => {
-  const diff = new Date() - new Date(dateString);
-  const diffMinutes = Math.floor(diff / 1000 / 60);
-  const diffHours = Math.floor(diff / 1000 / 60 / 60);
-  const diffDays = Math.floor(diff / 1000 / 60 / 60 / 24);
-  const diffWeeks = Math.floor(diff / 1000 / 60 / 60 / 24 / 7);
-
-  if (diffMinutes < 60)
-    return `${diffMinutes} minute${diffMinutes > 1 ? "s" : ""} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
-  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
-  return `${diffWeeks} week${diffWeeks > 1 ? "s" : ""} ago`;
 };

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { FloatingInbox } from "./FloatingInbox-text";
 import { ethers } from "ethers";
-const InboxPage = ({ isPWA = false }) => {
+const InboxPage = ({ isPWA = false, isFullScreen = false }) => {
   const [signer, setSigner] = useState(null);
   const [walletConnected, setWalletConnected] = useState(false); // Add state for wallet connection
+
+  const isDesktopWidth = window.innerWidth >= 700;
+  const canBeFullScreen = isDesktopWidth && isFullScreen;
 
   const disconnectWallet = () => {
     localStorage.removeItem("walletConnected");
@@ -143,6 +146,7 @@ const InboxPage = ({ isPWA = false }) => {
         env={process.env.REACT_APP_XMTP_ENV}
         wallet={signer}
         isPWA={isPWA}
+        isFullScreen={canBeFullScreen}
       />
     </>
   );

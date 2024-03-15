@@ -14,7 +14,7 @@ export const MessageContainer = ({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const [showPopup, setShowPopup] = useState(
-    conversation.consentState === "unknown",
+    conversation?.consentState === "unknown",
   );
 
   const styles = {

@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Client } from "@xmtp/xmtp-js";
 import { ethers } from "ethers";
 import { ConversationContainer } from "./ConversationContainer";
-
+import { MessageContainer } from "./MessageContainer";
 export function FloatingInbox({
   wallet,
   env,
   isPWA = false,
-
+  isFullScreen = true,
   onLogout,
   isContained = false,
   isConsent = false,
@@ -16,6 +16,10 @@ export function FloatingInbox({
   const [isOnNetwork, setIsOnNetwork] = useState(false);
   const [client, setClient] = useState();
   const [isConnected, setIsConnected] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [signer, setSigner] = useState();
+  const [isWalletCreated, setIsWalletCreated] = useState(false);
+  const [envSelection, setEnvSelection] = useState("production"); // Default to 'production'
 
   useEffect(() => {
     const initialIsOpen =
@@ -31,10 +35,10 @@ export function FloatingInbox({
     setIsOpen(initialIsOpen);
     setIsOnNetwork(initialIsOnNetwork);
     setIsConnected(initialIsConnected);
-  }, []);
 
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [signer, setSigner] = useState();
+    const hasLoggedOut = localStorage.getItem("hasLoggedOut") === "true";
+    setIsConnected(!hasLoggedOut); // Set isConnected based on the negation of hasLoggedOut
+  }, []);
 
   const styles = {
     FloatingLogo: {
@@ -100,7 +104,7 @@ export function FloatingInbox({
     conversationHeaderH4: {
       margin: "0px",
       padding: "4px",
-      fontSize: isPWA == true ? "20px" : "14px", // Increased font size
+      fontSize: isPWA == true ? "16px" : "12px", // Increased font size
     },
     backButton: {
       border: "0px",
@@ -134,17 +138,33 @@ export function FloatingInbox({
   };
 
   useEffect(() => {
-    if (wallet) {
-      setSigner(wallet);
-      setIsConnected(true);
-    }
-    if (client && !isOnNetwork) {
-      setIsOnNetwork(true);
-    }
-    if (signer && isOnNetwork && isConnected) {
-      initXmtpWithKeys();
-    }
-  }, [wallet, isOnNetwork, isConnected]);
+    const init = async () => {
+      console.log(
+        signer?._address,
+        isOnNetwork,
+        isConnected,
+        localStorage.getItem("hasLoggedOut"),
+      );
+
+      if (wallet) {
+        setSigner(wallet);
+        setIsConnected(true);
+      }
+      if (client && !isOnNetwork) {
+        setIsOnNetwork(true);
+      }
+      if (signer && isOnNetwork && isConnected) {
+        initXmtpWithKeys();
+      }
+      if (signer && isConnected && !isOnNetwork) {
+        await initXmtpWithKeys();
+      }
+      if (!signer && isConnected) {
+        await connectWallet();
+      }
+    };
+    init();
+  }, [wallet, signer, isOnNetwork, isConnected]);
 
   useEffect(() => {
     localStorage.setItem("isOnNetwork", isOnNetwork.toString());
@@ -161,6 +181,7 @@ export function FloatingInbox({
         setSigner(signer);
         console.log("Your address", await getAddress(signer));
         setIsConnected(true);
+        localStorage.removeItem("hasLoggedOut"); // Clear the logout flag
       } catch (error) {
         console.error("User rejected request", error);
       }
@@ -168,6 +189,17 @@ export function FloatingInbox({
       console.error("Metamask not found");
     }
   };
+  useEffect(() => {
+    const path = window.location.pathname;
+    const match = path.match(/\/dm\/(0x[a-fA-F0-9]{40})/); // Adjust regex as needed
+    if (match) {
+      const address = match[1];
+      // Logic to find and select the conversation based on the address
+      // For example:
+      console.log("Selecting conversation with address", address);
+      // selectConversationByAddress(address);
+    }
+  }, []);
 
   const getAddress = async (signer) => {
     try {
@@ -185,8 +217,6 @@ export function FloatingInbox({
       console.log(e);
     }
   };
-
-  const [isWalletCreated, setIsWalletCreated] = useState(false);
 
   const createNewWallet = async () => {
     const newWallet = ethers.Wallet.createRandom();
@@ -210,6 +240,7 @@ export function FloatingInbox({
       close: closeWidget,
     };
   }
+
   const handleLogout = async () => {
     setIsConnected(false);
     const address = await getAddress(signer);
@@ -221,6 +252,8 @@ export function FloatingInbox({
     setSelectedConversation(null);
     localStorage.removeItem("isOnNetwork");
     localStorage.removeItem("isConnected");
+    localStorage.setItem("hasLoggedOut", "true"); // Set flag indicating logout
+
     if (typeof onLogout === "function") {
       onLogout();
     }
@@ -232,9 +265,11 @@ export function FloatingInbox({
     }
     let address = await getAddress(signer);
     let keys = loadKeys(address);
+
     const clientOptions = {
-      env: env ? env : getEnv(),
+      env: !isFullScreen ? (env ? env : getEnv()) : envSelection,
     };
+
     if (!keys) {
       keys = await Client.getKeys(signer, {
         ...clientOptions,
@@ -254,7 +289,6 @@ export function FloatingInbox({
       await xmtp.contacts.refreshConsentList();
     }
   };
-
   return (
     <>
       {!isPWA && !isContained && (
@@ -289,6 +323,7 @@ export function FloatingInbox({
                     ←
                   </button>
                 )}
+
                 <h4 style={styles.conversationHeaderH4}>Conversations</h4>
               </div>
             </div>
@@ -297,6 +332,17 @@ export function FloatingInbox({
           <div style={styles.widgetContent}>
             {!isConnected && (
               <div style={styles.xmtpContainer}>
+                {/*<div>
+                  <label>
+                    Environment:
+                    <select
+                      value={envSelection}
+                      onChange={(e) => setEnvSelection(e.target.value)}>
+                      <option value="production">Production</option>
+                      <option value="dev">Development</option>
+                    </select>
+                  </label>
+            </div>*/}
                 <button style={styles.btnXmtp} onClick={connectWallet}>
                   Connect Wallet
                 </button>
@@ -317,15 +363,45 @@ export function FloatingInbox({
                 )}
               </div>
             )}
-            {isConnected && isOnNetwork && client && (
+            {!isFullScreen && isConnected && isOnNetwork && client && (
               <ConversationContainer
                 isPWA={isPWA}
                 client={client}
+                isFullScreen={isFullScreen}
                 isConsent={isConsent}
                 isContained={isContained}
                 selectedConversation={selectedConversation}
                 setSelectedConversation={setSelectedConversation}
               />
+            )}
+            {isConnected && isOnNetwork && client && isFullScreen && (
+              <div style={{ display: "flex", height: "100%" }}>
+                <div style={{ flex: 1, overflowY: "auto" }}>
+                  <ConversationContainer
+                    isPWA={isPWA}
+                    client={client}
+                    isConsent={isConsent}
+                    isFullScreen={isFullScreen}
+                    isContained={isContained}
+                    selectedConversation={selectedConversation}
+                    setSelectedConversation={setSelectedConversation}
+                  />
+                </div>
+                <div style={{ flex: 2, overflowY: "auto" }}>
+                  {selectedConversation?.id}
+                  {selectedConversation && (
+                    <MessageContainer
+                      client={client}
+                      isContained={isContained}
+                      isFullScreen={isFullScreen}
+                      conversation={selectedConversation}
+                      searchTerm={""}
+                      isConsent={isConsent}
+                      selectConversation={selectedConversation}
+                    />
+                  )}
+                </div>
+              </div>
             )}
           </div>
         </div>

@@ -20,9 +20,7 @@ export const ListConversations = ({
       borderBottom: "1px solid #e0e0e0",
       cursor: "pointer",
       backgroundColor: "#f0f0f0",
-      padding: "10px",
       transition: "background-color 0.3s ease",
-
       padding: isPWA == true ? "15px" : "10px",
     },
     conversationDetails: {
@@ -34,7 +32,7 @@ export const ListConversations = ({
       overflow: "hidden",
     },
     conversationName: {
-      fontSize: isPWA == true ? "20px" : "16px",
+      fontSize: isPWA == true ? "15px" : "16px",
       fontWeight: "bold",
     },
     messagePreview: {
@@ -45,7 +43,7 @@ export const ListConversations = ({
       textOverflow: "ellipsis",
     },
     conversationTimestamp: {
-      fontSize: isPWA == true ? "16px" : "12px",
+      fontSize: isPWA == true ? "10px" : "10px",
       color: "#999",
       width: "25%",
       textAlign: "right",

@@ -15,7 +15,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
 
   const renderMessage = (message) => {
     const codec = client.codecFor(message.contentType);
-    console.log("codec", codec);
     let content = message.content;
     if (!codec) {
       /*Not supported content type*/
@@ -46,10 +45,11 @@ export const MessageItem = ({ message, senderAddress, client }) => {
 
 const styles = {
   messageContent: {
-    backgroundColor: "lightblue",
+    backgroundColor: "rgb(79 70 229)",
     padding: "5px 10px",
     alignSelf: "flex-start",
     textAlign: "left",
+    color: "white",
     display: "inline-block",
     margin: "5px",
     borderRadius: "5px",
@@ -82,6 +82,6 @@ const styles = {
   },
   timeStamp: {
     fontSize: "8px",
-    color: "grey",
+    color: "lightgrey",
   },
 };
