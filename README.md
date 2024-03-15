@@ -1,4 +1,4 @@
-# XMTP Quickstart Web
+# XMTP Web Client
 
 ![xmtp](https://github.com/xmtp/xmtp-quickstart-reactjs/assets/1447073/3f2979ec-4d13-4c3d-bf20-deab3b2ffaa1)
 
@@ -9,7 +9,7 @@ bun install
 bun start
 ```
 
-## Concepts
+## Features
 
 Head to our docs to understand XMTP's concepts
 
@@ -18,6 +18,7 @@ Head to our docs to understand XMTP's concepts
 - [Conversations](https://xmtp.org/docs/build/conversations?sdk=js)
 - [Messages](https://xmtp.org/docs/build/messages/?sdk=js)
 - [Streams](https://xmtp.org/docs/build/streams/?sdk=js)
+- [Frames](https://xmtp.org/docs/build/frames)
 
 #### Troubleshooting
 
