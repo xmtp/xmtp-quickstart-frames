@@ -115,6 +115,7 @@ export const ListConversations = ({
     const fetchLastMessages = async () => {
       try {
         const messages = [];
+        console.log("setLastMessages called", conversations.length);
         for (const conversation of conversations) {
           const conversationMessages = await conversation.messages();
           messages.push(
