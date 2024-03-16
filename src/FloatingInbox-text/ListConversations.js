@@ -12,6 +12,7 @@ export const ListConversations = ({
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
+  const [conversationsEnriched, setConversationsEnriched] = useState(false); // New state to track if conversations are enriched
 
   const styles = {
     conversationListItem: {
@@ -46,7 +47,7 @@ export const ListConversations = ({
       fontWeight: "bold",
     },
     messagePreview: {
-      fontSize: isPWA == true ? "18px" : "14px",
+      fontSize: isPWA == true ? "12px" : "12px",
       color: "#666",
       whiteSpace: "nowrap",
       overflow: "hidden",
@@ -70,6 +71,7 @@ export const ListConversations = ({
     const fetchAndStreamConversations = async () => {
       setLoading(true);
       const allConversations = await client.conversations.list();
+      // Assuming you have a method to fetch the last message for a conversation
 
       const sortedConversations = allConversations.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
@@ -91,7 +93,8 @@ export const ListConversations = ({
             );
           });
         }
-        break;
+
+        //break;
       }
     };
 
@@ -104,21 +107,41 @@ export const ListConversations = ({
       }
     };
   }, []);
+  const [lastMessages, setLastMessages] = useState([]); // Parallel array for last messages
+
+  useEffect(() => {
+    const fetchLastMessages = async () => {
+      const messages = await Promise.all(
+        conversations.map(async (conversation) => {
+          if (typeof conversation?.messages === "function") {
+            const conversationMessages = await conversation.messages();
+            return (
+              conversationMessages[conversationMessages.length - 1]?.content ||
+              "..."
+            );
+          }
+          return "...";
+        }),
+      );
+      setLastMessages(messages);
+    };
+
+    if (conversations.length > 0) {
+      fetchLastMessages();
+    }
+  }, [conversations]); // Fetch last messages whenever conversations update
 
   useEffect(() => {
     const path = window.location.pathname;
     const match = path.match(/\/dm\/(0x[a-fA-F0-9]{40})/); // Adjust regex as needed
     if (match) {
       const address = match[1];
-      console.log("Selecting conversation with address", address);
       const conversationToSelect = conversations.find(
         (conv) => conv.peerAddress === address,
       );
       if (conversationToSelect) {
         selectConversation(conversationToSelect);
         setSelectedConversation(conversationToSelect?.peerAddress);
-        const urlWithoutQueryParams = new URL(window.location.href);
-        console.log(urlWithoutQueryParams);
         navigate("", { replace: true });
       } else {
         console.log("No conversation found with address:", address);
@@ -170,7 +193,9 @@ export const ListConversations = ({
                   conversation.peerAddress.length - 4,
                 )}
             </span>
-            <span style={styles.messagePreview}>...</span>
+            <span style={styles.messagePreview}>
+              {lastMessages[index]} {/* Display last message */}
+            </span>
           </div>
           <div style={styles.conversationTimestamp}>
             {getRelativeTimeLabel(conversation.createdAt)}

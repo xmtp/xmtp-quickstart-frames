@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { FloatingInbox } from "./FloatingInbox-text";
 import { ethers } from "ethers";
-const InboxPage = ({ isPWA = false, isFullScreen = false }) => {
+const InboxPage = ({
+  isPWA = false,
+  isFullScreen = false,
+  isConsent = false,
+}) => {
   const [signer, setSigner] = useState(null);
   const [walletConnected, setWalletConnected] = useState(false); // Add state for wallet connection
 
@@ -147,6 +151,7 @@ const InboxPage = ({ isPWA = false, isFullScreen = false }) => {
         wallet={signer}
         isPWA={isPWA}
         isFullScreen={canBeFullScreen}
+        isConsent={isConsent}
       />
     </>
   );

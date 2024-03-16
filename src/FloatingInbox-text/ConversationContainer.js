@@ -125,7 +125,6 @@ export const ConversationContainer = ({
     setConversationFound(false);
     setSearchTerm(e.target.value);
     updateSearchTerm(e.target.value);
-    console.log("handleSearchChange", e.target.value);
     setMessage("Searching...");
     const addressInput = e.target.value;
     const isEthDomain = /\.eth$/.test(addressInput);

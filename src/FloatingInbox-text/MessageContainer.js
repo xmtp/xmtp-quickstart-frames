@@ -41,6 +41,9 @@ export const MessageContainer = ({
       fontSize: "12px",
       padding: "5px",
     },
+    peerAddressContainerhref: {
+      textDecoration: "none",
+    },
     messagesList: {
       paddingLeft: "5px",
       paddingRight: "5px",
@@ -93,17 +96,22 @@ export const MessageContainer = ({
 
   useEffect(() => {
     const fetchMessages = async () => {
-      if (conversation && conversation.peerAddress) {
-        setIsLoading(true);
-        const initialMessages = await conversation?.messages();
+      try {
+        if (conversation && conversation.peerAddress) {
+          setIsLoading(true);
 
-        let updatedMessages = [];
-        initialMessages.forEach((message) => {
-          updatedMessages = updateMessages(updatedMessages, message);
-        });
+          const initialMessages = await conversation?.messages();
 
-        setMessages(updatedMessages);
-        setIsLoading(false);
+          let updatedMessages = [];
+          initialMessages.forEach((message) => {
+            updatedMessages = updateMessages(updatedMessages, message);
+          });
+
+          setMessages(updatedMessages);
+          setIsLoading(false);
+        }
+      } catch (e) {
+        console.log(e);
       }
     };
 
@@ -134,12 +142,16 @@ export const MessageContainer = ({
     console.log("denied", conversation.peerAddress);
   };
   const startMessageStream = async () => {
-    let stream = await conversation.streamMessages();
-    for await (const message of stream) {
-      console.log(message.senderAddress, message.content);
-      setMessages((prevMessages) => {
-        return updateMessages(prevMessages, message);
-      });
+    try {
+      let stream = await conversation?.streamMessages();
+      for await (const message of stream) {
+        console.log(message.senderAddress, message.content);
+        setMessages((prevMessages) => {
+          return updateMessages(prevMessages, message);
+        });
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -178,7 +190,14 @@ export const MessageContainer = ({
           {isFullScreen && (
             <div style={styles.peerAddressContainer}>
               <p style={styles.peerAddressContainerLabel}>
-                To: {conversation.peerAddress}
+                To:{" "}
+                <a
+                  href={window.location.href + "dm/" + conversation.peerAddress}
+                  style={styles.peerAddressContainerhref}
+                  target="_blank"
+                  rel="noreferrer">
+                  {conversation.peerAddress}
+                </a>
               </p>
             </div>
           )}

@@ -20,7 +20,6 @@ Below are the URLs for accessing XMTP in different network environments.
 
 Head to our docs to understand XMTP's concepts
 
-- [Get started](https://xmtp.org/docs/build/get-started/overview?sdk=js)
 - [Authentication](https://xmtp.org/docs/build/authentication?sdk=js)
 - [Conversations](https://xmtp.org/docs/build/conversations?sdk=js)
 - [Messages](https://xmtp.org/docs/build/messages/?sdk=js)

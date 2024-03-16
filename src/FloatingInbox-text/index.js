@@ -141,13 +141,6 @@ export function FloatingInbox({
 
   useEffect(() => {
     const init = async () => {
-      console.log(
-        signer?._address,
-        isOnNetwork,
-        isConnected,
-        localStorage.getItem("hasLoggedOut"),
-      );
-
       if (wallet) {
         setSigner(wallet);
         setIsConnected(true);
@@ -374,6 +367,7 @@ export function FloatingInbox({
                     isConsent={isConsent}
                     isFullScreen={isFullScreen}
                     isContained={isContained}
+                    updateSearchTerm={setSearchTerm}
                     selectedConversation={selectedConversation}
                     setSelectedConversation={setSelectedConversation}
                   />

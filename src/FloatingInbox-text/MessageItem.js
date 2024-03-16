@@ -65,7 +65,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   const conversationTopic = message.contentTopic;
 
   const handleFrameButtonClick = async (buttonIndex, action = "post") => {
-    console.log("entr");
     if (!frameMetadata || !client || !frameMetadata?.frameInfo?.buttons) {
       return;
     }
