@@ -111,16 +111,16 @@ export const ListConversations = ({
   const [lastMessages, setLastMessages] = useState([]); // Parallel array for last messages
 
   useEffect(() => {
+    console.log("Conversations fetchLastMessages");
     const fetchLastMessages = async () => {
       const messages = await Promise.all(
         conversations.map(async (conversation) => {
-          if (typeof conversation?.messages === "function") {
-            const conversationMessages = await conversation.messages();
-            return (
-              conversationMessages[conversationMessages.length - 1]?.content ||
-              "..."
-            );
-          }
+          console.log("Conversations fetchLastMessages");
+          const conversationMessages = await conversation.messages();
+          return (
+            conversationMessages[conversationMessages.length - 1]?.content ||
+            "..."
+          );
           return "...";
         }),
       );
@@ -130,7 +130,7 @@ export const ListConversations = ({
     if (conversations.length > 0) {
       fetchLastMessages();
     }
-  }, [conversations]); // Fetch last messages whenever conversations update
+  }, [conversations]);
 
   useEffect(() => {
     const path = window.location.pathname;
