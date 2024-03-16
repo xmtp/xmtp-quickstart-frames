@@ -142,14 +142,34 @@ export function FloatingInbox({
     localStorage.setItem("isConnected", isConnected.toString());
   }, [isOpen, isConnected, isOnNetwork]);
 
+  const loadSavedWallet = () => {
+    const storedWalletAddress = localStorage.getItem("walletAddress");
+    if (storedWalletAddress) {
+      const privateKey = loadKeysEthers(storedWalletAddress);
+      if (privateKey) {
+        const wallet = new ethers.Wallet(privateKey);
+        return wallet;
+      }
+    }
+    return null;
+  };
+
   const connectWallet = async () => {
+    const savedWallet = loadSavedWallet();
+    if (savedWallet) {
+      setSigner(savedWallet);
+      setAddress(savedWallet.address);
+      setIsConnected(true);
+      return; // Stop execution if a wallet was successfully loaded
+    }
+
     if (typeof window.ethereum !== "undefined") {
       try {
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         setSigner(signer);
-        console.log("Your address", await getAddress(signer));
+        setAddress(await getAddress(signer));
         setIsConnected(true);
       } catch (error) {
         console.error("User rejected request", error);
@@ -178,8 +198,10 @@ export function FloatingInbox({
 
   const createNewWallet = async () => {
     const newWallet = ethers.Wallet.createRandom();
-    console.log("Your address", newWallet.address);
+    storeKeysEthers(newWallet.address, newWallet.privateKey);
     setSigner(newWallet);
+    setAddress(newWallet.address);
+
     setIsConnected(true);
     setIsWalletCreated(true); // Set isWalletCreated to true when a new wallet is created
   };
@@ -205,24 +227,27 @@ export function FloatingInbox({
     wipeKeys(address);
     localStorage.removeItem("onboarding");
     setSigner(null);
+    setAddress(null);
     setIsOnNetwork(false);
     setClient(null);
     setSelectedConversation(null);
     localStorage.removeItem("isOnNetwork");
     localStorage.removeItem("isConnected");
-
+    localStorage.removeItem("walletAddress");
     if (typeof onLogout === "function") {
       onLogout();
     }
   };
 
+  const [address, setAddress] = useState(null);
+
   useEffect(() => {
     const init = async () => {
       // get the loclstorage value of is on network
       const onboarding = localStorage.getItem("onboarding") === "true";
-      console.log("onboarding", onboarding);
       if (wallet) {
         setSigner(wallet);
+        setAddress(wallet.address);
         setIsConnected(true);
       }
       if (client && !isOnNetwork) {
@@ -234,7 +259,12 @@ export function FloatingInbox({
       if (signer && isConnected && !isOnNetwork && onboarding) {
         initXmtpWithKeys();
       }
-      if (!signer && (isConnected || onboarding)) {
+      if (
+        !signer &&
+        (isConnected ||
+          onboarding ||
+          localStorage.getItem("walletAddress") !== null)
+      ) {
         connectWallet();
       }
     };
@@ -307,6 +337,17 @@ export function FloatingInbox({
                   </button>
                 )}
                 <h4 style={styles.conversationHeaderH4}>Conversations</h4>
+                <div
+                  style={styles.label}
+                  onClick={() => {
+                    navigator.clipboard.writeText(signer.address);
+                    alert("Active address copied to clipboard");
+                  }}>
+                  {address?.substring(0, 7) +
+                    "..." +
+                    address?.substring(address?.length - 5)}{" "}
+                  📋
+                </div>
               </div>
             </div>
           )}
@@ -338,10 +379,19 @@ export function FloatingInbox({
                 <button style={styles.btnXmtp} onClick={initXmtpWithKeys}>
                   Connect to XMTP
                 </button>
-                {isWalletCreated && (
-                  <button style={styles.label}>
-                    Your addess: {signer.address}
-                  </button>
+                {isWalletCreated && signer?.address && (
+                  <div style={styles.label}>
+                    <div
+                      style={styles.label}
+                      onClick={() => {
+                        navigator.clipboard.writeText(signer.address);
+                        alert("Wallet address copied to clipboard");
+                      }}>
+                      Your address: {signer.address}
+                      <br></br>
+                      📋 (click to copy)
+                    </div>
+                  </div>
                 )}
               </div>
             )}
@@ -410,7 +460,14 @@ export const loadKeys = (walletAddress) => {
   const val = localStorage.getItem(buildLocalStorageKey(walletAddress));
   return val ? Buffer.from(val, ENCODING) : null;
 };
-
+export const storeKeysEthers = (walletAddress, keys) => {
+  localStorage.setItem("walletAddress", walletAddress);
+  localStorage.setItem(walletAddress, keys);
+};
+export const loadKeysEthers = (walletAddress) => {
+  const val = localStorage.getItem(walletAddress);
+  return val;
+};
 export const storeKeys = (walletAddress, keys) => {
   localStorage.setItem("onboarding", "true");
   localStorage.setItem(

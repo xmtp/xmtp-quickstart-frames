@@ -201,10 +201,10 @@ export const ListConversations = ({
             <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />
             <div style={styles.conversationDetails}>
               <span style={styles.conversationName}>
-                {conversation.peerAddress.substring(0, 6) +
+                {conversation.peerAddress.substring(0, 7) +
                   "..." +
                   conversation.peerAddress.substring(
-                    conversation.peerAddress.length - 4,
+                    conversation.peerAddress.length - 5,
                   )}
               </span>
               <span style={styles.messagePreview}>
