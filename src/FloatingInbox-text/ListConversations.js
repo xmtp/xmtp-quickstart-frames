@@ -109,7 +109,10 @@ export const ListConversations = ({
     };
   }, []);
   const [lastMessages, setLastMessages] = useState([]); // Parallel array for last messages
-
+  const [forceUpdate, setForceUpdate] = useState(0); // Add this line
+  const triggerReRender = () => {
+    setForceUpdate((prev) => prev + 1); // Increment to trigger re-render
+  };
   useEffect(() => {
     const fetchLastMessages = async () => {
       const messages = await Promise.all(
@@ -120,6 +123,7 @@ export const ListConversations = ({
         }),
       );
       setLastMessages(messages);
+      triggerReRender(); // Trigger re-render
     };
 
     if (conversations.length > 0) {
