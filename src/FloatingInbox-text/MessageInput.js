@@ -19,7 +19,7 @@ export const MessageInput = ({
       padding: "5px",
       border: "1px solid #ccc",
       borderRadius: "5px",
-      fontSize: isPWA == true ? "1.2em" : ".9em",
+      fontSize: isPWA == true ? "16px" : "16px",
       width: isPWA == true ? "82%" : "",
       outline: "none",
     },

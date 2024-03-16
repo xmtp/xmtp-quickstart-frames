@@ -65,40 +65,44 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   const conversationTopic = message.contentTopic;
 
   const handleFrameButtonClick = async (buttonIndex, action = "post") => {
-    if (!frameMetadata || !client || !frameMetadata?.frameInfo?.buttons) {
-      return;
+    try {
+      if (!frameMetadata || !client || !frameMetadata?.frameInfo?.buttons) {
+        return;
+      }
+      const { frameInfo, url: frameUrl } = frameMetadata;
+      if (!frameInfo.buttons) {
+        return;
+      }
+      const button = frameInfo.buttons[buttonIndex];
+      setFrameButtonUpdating(buttonIndex);
+      const framesClient = new FramesClient(client);
+      const postUrl = button.target || frameInfo.postUrl || frameUrl;
+      const payload = await framesClient.signFrameAction({
+        frameUrl,
+        inputText: textInputValue || undefined,
+        buttonIndex,
+        conversationTopic,
+        participantAccountAddresses: [senderAddress, client.address],
+      });
+      if (action === "post") {
+        const updatedFrameMetadata = await framesClient.proxy.post(
+          postUrl,
+          payload,
+        );
+        setFrameMetadata(updatedFrameMetadata);
+      } else if (action === "post_redirect") {
+        const { redirectedTo } = await framesClient.proxy.postRedirect(
+          postUrl,
+          payload,
+        );
+        window.open(redirectedTo, "_blank");
+      } else if (action === "link" && button?.target) {
+        window.open(button.target, "_blank");
+      }
+      setFrameButtonUpdating(0);
+    } catch (e) {
+      console.error(e);
     }
-    const { frameInfo, url: frameUrl } = frameMetadata;
-    if (!frameInfo.buttons) {
-      return;
-    }
-    const button = frameInfo.buttons[buttonIndex];
-    setFrameButtonUpdating(buttonIndex);
-    const framesClient = new FramesClient(client);
-    const postUrl = button.target || frameInfo.postUrl || frameUrl;
-    const payload = await framesClient.signFrameAction({
-      frameUrl,
-      inputText: textInputValue || undefined,
-      buttonIndex,
-      conversationTopic,
-      participantAccountAddresses: [senderAddress, client.address],
-    });
-    if (action === "post") {
-      const updatedFrameMetadata = await framesClient.proxy.post(
-        postUrl,
-        payload,
-      );
-      setFrameMetadata(updatedFrameMetadata);
-    } else if (action === "post_redirect") {
-      const { redirectedTo } = await framesClient.proxy.postRedirect(
-        postUrl,
-        payload,
-      );
-      window.open(redirectedTo, "_blank");
-    } else if (action === "link" && button?.target) {
-      window.open(button.target, "_blank");
-    }
-    setFrameButtonUpdating(0);
   };
 
   useEffect(() => {

@@ -114,7 +114,12 @@ export const ListConversations = ({
     const fetchLastMessages = async () => {
       try {
         const messages = [];
-        console.log("setLastMessages called", conversations.length);
+        console.log("conversations fetched", conversations.length);
+        if (conversations.length > 100) {
+          console.warn(
+            "Notice: This app is not optimized for performance with a high number of conversations. For a better experience, try with wallets that have fewer conversations.",
+          );
+        }
         for (const conversation of conversations) {
           const conversationMessages = await conversation.messages();
           const content =
