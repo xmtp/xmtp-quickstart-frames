@@ -179,7 +179,11 @@ export const ListConversations = ({
   }, [filteredConversations, onConversationFound]);
   return (
     <>
-      {selectedConversation === null ? (
+      {loading ? (
+        <div style={{ padding: "20px", fontSize: "12px", textAlign: "center" }}>
+          Loading conversations...
+        </div>
+      ) : selectedConversation === null && conversations.length === 0 ? (
         <div style={{ padding: "20px", fontSize: "12px", textAlign: "center" }}>
           No conversations found. Use the input above to start a new one.
         </div>

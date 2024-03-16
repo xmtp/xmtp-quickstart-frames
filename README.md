@@ -5,8 +5,8 @@
 ## Installation
 
 ```bash
-bun install
-bun start
+yarn install
+yarn start
 ```
 
 ## Network Environments
