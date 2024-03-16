@@ -13,8 +13,8 @@ bun start
 
 Below are the URLs for accessing XMTP in different network environments.
 
-- [Production Network](https://xmtp-web.vercel.app/)
-- [Dev Network](https://dev-xmtp-web.vercel.app/)
+- Production Network [xmtp-web](https://xmtp-web.vercel.app/)
+- Dev Network[dev-xmtp-web](https://dev-xmtp-web.vercel.app/)
 
 ## Features
 
