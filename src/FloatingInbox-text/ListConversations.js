@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -109,21 +110,17 @@ export const ListConversations = ({
     };
   }, []);
   const [lastMessages, setLastMessages] = useState([]); // Parallel array for last messages
-  const [forceUpdate, setForceUpdate] = useState(0); // Add this line
-  const triggerReRender = () => {
-    setForceUpdate((prev) => prev + 1); // Increment to trigger re-render
-  };
+
   useEffect(() => {
     const fetchLastMessages = async () => {
       const messages = await Promise.all(
         conversations.map(async (conversation) => {
           const conversationMessages = await conversation.messages();
-          console.log("Conversations ", conversationMessages?.length);
           return conversationMessages[conversationMessages.length - 1]?.content;
         }),
       );
+      console.log("setLastMessages updated", messages.length);
       setLastMessages(messages);
-      triggerReRender(); // Trigger re-render
     };
 
     if (conversations.length > 0) {
