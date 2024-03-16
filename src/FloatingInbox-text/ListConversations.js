@@ -7,6 +7,7 @@ export const ListConversations = ({
   selectConversation,
   onConversationFound,
   isPWA = false,
+  isFullScreen = false,
 }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -146,7 +147,7 @@ export const ListConversations = ({
       } else {
         console.log("No conversation found with address:", address);
       }
-    } else if (conversations.length > 0) {
+    } else if (conversations.length > 0 && isFullScreen) {
       // If no deep linking match, select the first conversation
       selectConversation(conversations[0]);
       setSelectedConversation(conversations[0]?.peerAddress);
@@ -194,7 +195,7 @@ export const ListConversations = ({
                 )}
             </span>
             <span style={styles.messagePreview}>
-              {lastMessages[index]} {/* Display last message */}
+              {lastMessages[index] ? lastMessages[index] : "..."}
             </span>
           </div>
           <div style={styles.conversationTimestamp}>

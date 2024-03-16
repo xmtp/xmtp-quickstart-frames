@@ -208,6 +208,7 @@ export const ConversationContainer = ({
           <ListConversations
             isPWA={isPWA}
             client={client}
+            isFullScreen={isFullScreen}
             searchTerm={searchTerm}
             selectConversation={setSelectedConversation}
             onConversationFound={(state) => {
