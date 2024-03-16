@@ -115,7 +115,8 @@ export const ListConversations = ({
         (conv) => conv.peerAddress === address,
       );
       if (conversationToSelect) {
-        selectConversation(conversationToSelect); // Construct a new URL without query parameters
+        selectConversation(conversationToSelect);
+        setSelectedConversation(conversationToSelect?.peerAddress);
         const urlWithoutQueryParams = new URL(window.location.href);
         console.log(urlWithoutQueryParams);
         navigate("", { replace: true });
@@ -125,6 +126,7 @@ export const ListConversations = ({
     } else if (conversations.length > 0) {
       // If no deep linking match, select the first conversation
       selectConversation(conversations[0]);
+      setSelectedConversation(conversations[0]?.peerAddress);
     }
   }, [conversations, selectConversation]);
 
