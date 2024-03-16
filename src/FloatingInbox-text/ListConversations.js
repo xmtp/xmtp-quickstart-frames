@@ -113,14 +113,19 @@ export const ListConversations = ({
 
   useEffect(() => {
     const fetchLastMessages = async () => {
-      const messages = await Promise.all(
-        conversations.map(async (conversation) => {
+      try {
+        const messages = [];
+        for (const conversation of conversations) {
           const conversationMessages = await conversation.messages();
-          return conversationMessages[conversationMessages.length - 1]?.content;
-        }),
-      );
-      console.log("setLastMessages updated", messages.length);
-      setLastMessages(messages);
+          messages.push(
+            conversationMessages[conversationMessages.length - 1]?.content,
+          );
+        }
+        console.log("setLastMessages updated", messages.length);
+        setLastMessages(messages);
+      } catch (error) {
+        console.error("Failed to fetch last messages:", error);
+      }
     };
 
     if (conversations.length > 0) {
