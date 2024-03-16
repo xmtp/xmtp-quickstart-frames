@@ -340,8 +340,8 @@ export function FloatingInbox({
                 <div
                   style={styles.label}
                   onClick={() => {
-                    navigator.clipboard.writeText(signer.address);
-                    alert("Active address copied to clipboard");
+                    navigator.clipboard.writeText(address);
+                    alert("Address copied to clipboard");
                   }}>
                   {address?.substring(0, 7) +
                     "..." +
@@ -385,7 +385,7 @@ export function FloatingInbox({
                       style={styles.label}
                       onClick={() => {
                         navigator.clipboard.writeText(signer.address);
-                        alert("Wallet address copied to clipboard");
+                        alert("Address copied to clipboard");
                       }}>
                       Your address: {signer.address}
                       <br></br>
