@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const ListConversations = ({
   searchTerm,
@@ -7,8 +8,11 @@ export const ListConversations = ({
   onConversationFound,
   isPWA = false,
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useState(null);
 
   const styles = {
     conversationListItem: {
@@ -22,6 +26,13 @@ export const ListConversations = ({
       backgroundColor: "#f0f0f0",
       transition: "background-color 0.3s ease",
       padding: isPWA == true ? "15px" : "10px",
+    },
+    avatarImage: {
+      // New style for the avatar image
+      width: "40px", // Adjust the size as needed
+      height: "40px", // Adjust the size as needed
+      borderRadius: "50%", // Makes the image circular
+      marginRight: "10px", // Adds some space between the image and the text
     },
     conversationDetails: {
       display: "flex",
@@ -53,6 +64,17 @@ export const ListConversations = ({
       justifyContent: "space-between",
     },
   };
+  useEffect(() => {
+    // This function removes query parameters and navigates.
+    const removeQueryParams = () => {
+      // Navigate to the same pathname but without query params.
+      console.log("Navigating to", location.pathname);
+      console.log(location);
+      navigate(location.pathname, { replace: true });
+    };
+
+    removeQueryParams();
+  }, [navigate, location.pathname]);
 
   useEffect(() => {
     let isMounted = true;
@@ -105,7 +127,10 @@ export const ListConversations = ({
         (conv) => conv.peerAddress === address,
       );
       if (conversationToSelect) {
-        selectConversation(conversationToSelect);
+        selectConversation(conversationToSelect); // Construct a new URL without query parameters
+        const urlWithoutQueryParams = new URL(window.location.href);
+        console.log(urlWithoutQueryParams);
+        navigate("", { replace: true });
       } else {
         console.log("No conversation found with address:", address);
       }
@@ -128,15 +153,25 @@ export const ListConversations = ({
       onConversationFound(true);
     }
   }, [filteredConversations, onConversationFound]);
+
   return (
     <>
       {filteredConversations.map((conversation, index) => (
         <li
           key={index}
-          style={styles.conversationListItem}
+          style={{
+            ...styles.conversationListItem,
+            backgroundColor:
+              selectedConversation === conversation.peerAddress
+                ? "#d0e0f0"
+                : styles.conversationListItem.backgroundColor, // Change "#d0e0f0" to your preferred color
+          }}
           onClick={() => {
             selectConversation(conversation);
+            setSelectedConversation(conversation.peerAddress);
           }}>
+          <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />{" "}
+          {/* Avatar image added here */}
           <div style={styles.conversationDetails}>
             <span style={styles.conversationName}>
               {conversation.peerAddress.substring(0, 6) +

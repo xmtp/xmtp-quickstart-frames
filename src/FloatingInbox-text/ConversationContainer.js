@@ -7,12 +7,15 @@ import { MessageContainer } from "./MessageContainer";
 export const ConversationContainer = ({
   client,
   selectedConversation,
+  updateSearchTerm,
   setSelectedConversation,
   isFullScreen = false,
   isContained = false,
   isPWA = false,
   isConsent = false,
 }) => {
+  // Existing state declarations
+  const [loadingNewConv, setLoadingNewConv] = useState(false); // Add this line for new conversation loading state
   const [searchTerm, setSearchTerm] = useState("");
   const [peerAddress, setPeerAddress] = useState("");
   const [message, setMessage] = useState("");
@@ -74,6 +77,17 @@ export const ConversationContainer = ({
       alignItems: "flex-end",
       justifyContent: "space-between",
     },
+    createNewLoading: {
+      display: "block",
+      border: "1px",
+      padding: "5px",
+      borderRadius: "5px",
+      marginTop: "10px",
+      textAlign: "center",
+      backgroundColor: "#f0f0f0",
+      margin: "0 auto",
+      fontSize: "14px",
+    },
     createNewButton: {
       display: "block",
       border: "1px",
@@ -94,6 +108,7 @@ export const ConversationContainer = ({
       padding: "10px",
       boxSizing: "border-box",
       border: "0px solid #ccc",
+      outline: "none",
     },
   };
 
@@ -109,6 +124,7 @@ export const ConversationContainer = ({
     setCreateNew(false);
     setConversationFound(false);
     setSearchTerm(e.target.value);
+    updateSearchTerm(e.target.value);
     console.log("handleSearchChange", e.target.value);
     setMessage("Searching...");
     const addressInput = e.target.value;
@@ -130,7 +146,8 @@ export const ConversationContainer = ({
     console.log("resolvedAddress", resolvedAddress);
     if (resolvedAddress && isValidEthereumAddress(resolvedAddress)) {
       processEthereumAddress(resolvedAddress);
-      setSearchTerm(resolvedAddress); // <-- Add this line
+      setSearchTerm(resolvedAddress);
+      updateSearchTerm(resolvedAddress);
     } else {
       setMessage("Invalid Ethereum address");
       setPeerAddress(null);
@@ -184,7 +201,6 @@ export const ConversationContainer = ({
             searchTerm={searchTerm}
             selectConversation={setSelectedConversation}
             onConversationFound={(state) => {
-              console.log("onConversationFound", state);
               setConversationFound(state);
               if (state === true) setCreateNew(false);
             }}
@@ -196,7 +212,6 @@ export const ConversationContainer = ({
             searchTerm={searchTerm}
             selectConversation={setSelectedConversation}
             onConversationFound={(state) => {
-              console.log("onConversationFound", state);
               setConversationFound(state);
               if (state === true) setCreateNew(false);
             }}
@@ -206,13 +221,29 @@ export const ConversationContainer = ({
           <small style={styles.messageClass}>{message}</small>
         )}
         {peerAddress && createNew && !conversationFound && (
-          <button
-            style={styles.createNewButton}
-            onClick={() => {
-              setSelectedConversation({ messages: [] });
-            }}>
-            Create new conversation
-          </button>
+          <>
+            {loadingNewConv ? ( // Check if loadingNewConv is true
+              <button style={styles.createNewLoading}>Loading...</button> // Display loading message or spinner
+            ) : (
+              <button
+                style={styles.createNewButton}
+                onClick={async () => {
+                  setLoadingNewConv(true); // Set loading state to true
+                  try {
+                    const newConversation =
+                      await client.conversations.newConversation(peerAddress);
+                    setSelectedConversation(newConversation);
+                  } catch (error) {
+                    console.error("Failed to create new conversation", error);
+                    // Optionally handle error (e.g., display error message)
+                  } finally {
+                    setLoadingNewConv(false); // Reset loading state regardless of outcome
+                  }
+                }}>
+                Create new conversation
+              </button>
+            )}
+          </>
         )}
       </ul>
     );

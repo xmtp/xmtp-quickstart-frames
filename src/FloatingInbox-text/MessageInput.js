@@ -10,10 +10,9 @@ export const MessageInput = ({
     newMessageContainer: {
       display: "flex",
       alignItems: "center",
-      paddingLeft: "10px",
-      paddingRight: "10px",
       flexWrap: "wrap",
-      paddingBottom: "10px",
+      padding: "0px",
+      margin: "1rem",
     },
     messageInputField: {
       flexGrow: 1,

@@ -20,6 +20,8 @@ export function FloatingInbox({
   const [signer, setSigner] = useState();
   const [isWalletCreated, setIsWalletCreated] = useState(false);
   const [envSelection, setEnvSelection] = useState("production"); // Default to 'production'
+  // Add searchTerm state in FloatingInbox component
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const initialIsOpen =
@@ -131,9 +133,9 @@ export function FloatingInbox({
       color: "#000",
       justifyContent: "center",
       border: "1px solid grey",
-      padding: isPWA == true ? "20px" : "10px",
+      padding: isPWA == true ? "16px" : "10px",
       borderRadius: "5px",
-      fontSize: isPWA == true ? "20px" : "14px",
+      fontSize: isPWA == true ? "16px" : "14px",
     },
   };
 
@@ -358,13 +360,14 @@ export function FloatingInbox({
                 isFullScreen={isFullScreen}
                 isConsent={isConsent}
                 isContained={isContained}
+                updateSearchTerm={setSearchTerm}
                 selectedConversation={selectedConversation}
                 setSelectedConversation={setSelectedConversation}
               />
             )}
             {isConnected && isOnNetwork && client && isFullScreen && (
               <div style={{ display: "flex", height: "100%" }}>
-                <div style={{ flex: 1, overflowY: "auto", maxWidth: "350px" }}>
+                <div style={{ flex: 1, overflowY: "auto", maxWidth: "450px" }}>
                   <ConversationContainer
                     isPWA={isPWA}
                     client={client}

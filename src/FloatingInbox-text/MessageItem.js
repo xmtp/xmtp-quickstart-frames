@@ -19,6 +19,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     messageContent: {
       backgroundColor: "rgb(79 70 229)",
       padding: "5px 10px",
+
       alignSelf: "flex-start",
       textAlign: "left",
       color: "white",
@@ -64,6 +65,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   const conversationTopic = message.contentTopic;
 
   const handleFrameButtonClick = async (buttonIndex, action = "post") => {
+    console.log("entr");
     if (!frameMetadata || !client || !frameMetadata?.frameInfo?.buttons) {
       return;
     }
@@ -83,7 +85,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       participantAccountAddresses: [senderAddress, client.address],
     });
     if (action === "post") {
-      console.log(postUrl, payload);
       const updatedFrameMetadata = await framesClient.proxy.post(
         postUrl,
         payload,
@@ -115,18 +116,21 @@ export const MessageItem = ({ message, senderAddress, client }) => {
         const words = message.content.split(/(\r?\n|\s+)/);
         const urlRegex =
           /^(http[s]?:\/\/)?([a-z0-9.-]+\.[a-z0-9]{1,}\/.*|[a-z0-9.-]+\.[a-z0-9]{1,})$/i;
-
-        await Promise.all(
-          words.map(async (word) => {
-            const isUrl = !!word.match(urlRegex)?.[0];
-            if (isUrl) {
-              const metadata = await readMetadata(word); // Ensure you have implemented this function
-              if (metadata) {
-                setFrameMetadata(metadata);
+        try {
+          await Promise.all(
+            words.map(async (word) => {
+              const isUrl = !!word.match(urlRegex)?.[0];
+              if (isUrl) {
+                const metadata = await readMetadata(word); // Ensure you have implemented this function
+                if (metadata) {
+                  setFrameMetadata(metadata);
+                }
               }
-            }
-          }),
-        );
+            }),
+          );
+        } catch (e) {
+          console.error(e);
+        }
       }
       setIsLoading(false);
     };

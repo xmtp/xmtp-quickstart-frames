@@ -36,9 +36,10 @@ export const MessageContainer = ({
       padding: "0px",
       margin: "2px",
     },
-    peerAddressContainerP: {
+    peerAddressContainerLabel: {
       margin: "0px",
       fontSize: "12px",
+      padding: "5px",
     },
     messagesList: {
       paddingLeft: "5px",
@@ -162,7 +163,6 @@ export const MessageContainer = ({
     if (conversation && conversation.peerAddress) {
       await conversation.send(newMessage);
     } else if (conversation) {
-      console.log("entra");
       const conv = await client.conversations.newConversation(searchTerm);
       await conv.send(newMessage);
       selectConversation(conv);
@@ -175,14 +175,14 @@ export const MessageContainer = ({
         <div style={styles.loadingText}>Loading messages...</div>
       ) : (
         <>
+          {isFullScreen && (
+            <div style={styles.peerAddressContainer}>
+              <p style={styles.peerAddressContainerLabel}>
+                To: {conversation.peerAddress}
+              </p>
+            </div>
+          )}
           <ul style={styles.messagesList}>
-            {isFullScreen && (
-              <div style={styles.peerAddressContainer}>
-                <p style={styles.peerAddressContainerP}>
-                  Chatting with: {conversation.peerAddress}
-                </p>
-              </div>
-            )}
             {messages.slice().map((message) => {
               return (
                 <MessageItem
