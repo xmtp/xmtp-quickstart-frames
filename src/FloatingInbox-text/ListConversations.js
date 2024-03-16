@@ -14,7 +14,6 @@ export const ListConversations = ({
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
-  const [conversationsEnriched, setConversationsEnriched] = useState(false); // New state to track if conversations are enriched
 
   const styles = {
     conversationListItem: {
@@ -118,6 +117,9 @@ export const ListConversations = ({
         console.log("setLastMessages called", conversations.length);
         for (const conversation of conversations) {
           const conversationMessages = await conversation.messages();
+          const content =
+            conversationMessages[conversationMessages.length - 1]?.content;
+          console.log(content);
           messages.push(
             conversationMessages[conversationMessages.length - 1]?.content,
           );
