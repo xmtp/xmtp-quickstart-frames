@@ -9,6 +9,13 @@ bun install
 bun start
 ```
 
+## Network Environments
+
+Below are the URLs for accessing XMTP in different network environments.
+
+- [Production Network](https://xmtp-web.vercel.app/)
+- [Dev Network](https://dev-xmtp-web.vercel.app/)
+
 ## Features
 
 Head to our docs to understand XMTP's concepts
