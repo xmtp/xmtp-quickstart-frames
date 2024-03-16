@@ -28,6 +28,7 @@ export const ConversationContainer = ({
   const styles = {
     conversations: {
       height: "100%",
+      backgroundColor: "#f0f0f0",
     },
     conversationList: {
       padding: "0px",
