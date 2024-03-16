@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const ListConversations = ({
   searchTerm,
@@ -9,7 +9,6 @@ export const ListConversations = ({
   isPWA = false,
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -64,17 +63,6 @@ export const ListConversations = ({
       justifyContent: "space-between",
     },
   };
-  useEffect(() => {
-    // This function removes query parameters and navigates.
-    const removeQueryParams = () => {
-      // Navigate to the same pathname but without query params.
-      console.log("Navigating to", location.pathname);
-      console.log(location);
-      navigate(location.pathname, { replace: true });
-    };
-
-    removeQueryParams();
-  }, [navigate, location.pathname]);
 
   useEffect(() => {
     let isMounted = true;
