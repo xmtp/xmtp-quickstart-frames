@@ -25,6 +25,7 @@ export const ListConversations = ({
       borderBottom: "1px solid #e0e0e0",
       cursor: "pointer",
       backgroundColor: "#f0f0f0",
+
       transition: "background-color 0.3s ease",
       padding: isPWA == true ? "15px" : "10px",
     },
@@ -176,42 +177,46 @@ export const ListConversations = ({
       onConversationFound(true);
     }
   }, [filteredConversations, onConversationFound]);
-
   return (
     <>
-      {filteredConversations.map((conversation, index) => (
-        <li
-          key={index}
-          style={{
-            ...styles.conversationListItem,
-            backgroundColor:
-              selectedConversation === conversation.peerAddress
-                ? "#d0e0f0"
-                : styles.conversationListItem.backgroundColor, // Change "#d0e0f0" to your preferred color
-          }}
-          onClick={() => {
-            selectConversation(conversation);
-            setSelectedConversation(conversation.peerAddress);
-          }}>
-          <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />{" "}
-          {/* Avatar image added here */}
-          <div style={styles.conversationDetails}>
-            <span style={styles.conversationName}>
-              {conversation.peerAddress.substring(0, 6) +
-                "..." +
-                conversation.peerAddress.substring(
-                  conversation.peerAddress.length - 4,
-                )}
-            </span>
-            <span style={styles.messagePreview}>
-              {lastMessages[index] ? lastMessages[index] : "..."}
-            </span>
-          </div>
-          <div style={styles.conversationTimestamp}>
-            {getRelativeTimeLabel(conversation.createdAt)}
-          </div>
-        </li>
-      ))}
+      {selectedConversation === null ? (
+        <div style={{ padding: "20px", fontSize: "12px", textAlign: "center" }}>
+          No conversations found. Use the input above to start a new one.
+        </div>
+      ) : (
+        filteredConversations.map((conversation, index) => (
+          <li
+            key={index}
+            style={{
+              ...styles.conversationListItem,
+              backgroundColor:
+                selectedConversation === conversation.peerAddress
+                  ? "#d0e0f0"
+                  : styles.conversationListItem.backgroundColor,
+            }}
+            onClick={() => {
+              selectConversation(conversation);
+              setSelectedConversation(conversation.peerAddress);
+            }}>
+            <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />
+            <div style={styles.conversationDetails}>
+              <span style={styles.conversationName}>
+                {conversation.peerAddress.substring(0, 6) +
+                  "..." +
+                  conversation.peerAddress.substring(
+                    conversation.peerAddress.length - 4,
+                  )}
+              </span>
+              <span style={styles.messagePreview}>
+                {lastMessages[index] ? lastMessages[index] : "..."}
+              </span>
+            </div>
+            <div style={styles.conversationTimestamp}>
+              {getRelativeTimeLabel(conversation.createdAt)}
+            </div>
+          </li>
+        ))
+      )}
     </>
   );
 };

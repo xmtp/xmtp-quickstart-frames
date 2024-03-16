@@ -85,7 +85,8 @@ export const ConversationContainer = ({
       borderRadius: "5px",
       marginTop: "10px",
       textAlign: "center",
-      backgroundColor: "#f0f0f0",
+      color: "white",
+      backgroundColor: "rgb(79 70 229)",
       margin: "0 auto",
       fontSize: "14px",
     },
@@ -94,9 +95,10 @@ export const ConversationContainer = ({
       border: "1px",
       padding: "5px",
       borderRadius: "5px",
+      color: "white",
       marginTop: "10px",
       textAlign: "center",
-      backgroundColor: "#f0f0f0",
+      backgroundColor: "rgb(79 70 229)",
       margin: "0 auto",
       fontSize: "14px",
     },
@@ -234,6 +236,7 @@ export const ConversationContainer = ({
                     const newConversation =
                       await client.conversations.newConversation(peerAddress);
                     setSelectedConversation(newConversation);
+                    setSearchTerm("");
                   } catch (error) {
                     console.error("Failed to create new conversation", error);
                     // Optionally handle error (e.g., display error message)

@@ -37,9 +37,6 @@ export function FloatingInbox({
     setIsOpen(initialIsOpen);
     setIsOnNetwork(initialIsOnNetwork);
     setIsConnected(initialIsConnected);
-
-    const hasLoggedOut = localStorage.getItem("hasLoggedOut") === "true";
-    setIsConnected(!hasLoggedOut); // Set isConnected based on the negation of hasLoggedOut
   }, []);
 
   const styles = {
@@ -140,28 +137,6 @@ export function FloatingInbox({
   };
 
   useEffect(() => {
-    const init = async () => {
-      if (wallet) {
-        setSigner(wallet);
-        setIsConnected(true);
-      }
-      if (client && !isOnNetwork) {
-        setIsOnNetwork(true);
-      }
-      if (signer && isOnNetwork && isConnected) {
-        initXmtpWithKeys();
-      }
-      if (signer && isConnected && !isOnNetwork) {
-        await initXmtpWithKeys();
-      }
-      if (!signer && isConnected) {
-        await connectWallet();
-      }
-    };
-    init();
-  }, [wallet, signer, isOnNetwork, isConnected]);
-
-  useEffect(() => {
     localStorage.setItem("isOnNetwork", isOnNetwork.toString());
     localStorage.setItem("isWidgetOpen", isOpen.toString());
     localStorage.setItem("isConnected", isConnected.toString());
@@ -170,13 +145,12 @@ export function FloatingInbox({
   const connectWallet = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
+        await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         setSigner(signer);
         console.log("Your address", await getAddress(signer));
         setIsConnected(true);
-        localStorage.removeItem("hasLoggedOut"); // Clear the logout flag
       } catch (error) {
         console.error("User rejected request", error);
       }
@@ -229,19 +203,44 @@ export function FloatingInbox({
     setIsConnected(false);
     const address = await getAddress(signer);
     wipeKeys(address);
-    console.log("wipe", address);
+    localStorage.removeItem("onboarding");
     setSigner(null);
     setIsOnNetwork(false);
     setClient(null);
     setSelectedConversation(null);
     localStorage.removeItem("isOnNetwork");
     localStorage.removeItem("isConnected");
-    localStorage.setItem("hasLoggedOut", "true"); // Set flag indicating logout
 
     if (typeof onLogout === "function") {
       onLogout();
     }
   };
+
+  useEffect(() => {
+    const init = async () => {
+      // get the loclstorage value of is on network
+      const onboarding = localStorage.getItem("onboarding") === "true";
+      console.log("onboarding", onboarding);
+      if (wallet) {
+        setSigner(wallet);
+        setIsConnected(true);
+      }
+      if (client && !isOnNetwork) {
+        setIsOnNetwork(true);
+      }
+      if (signer && isOnNetwork && isConnected) {
+        initXmtpWithKeys();
+      }
+      if (signer && isConnected && !isOnNetwork && onboarding) {
+        initXmtpWithKeys();
+      }
+      if (!signer && (isConnected || onboarding)) {
+        connectWallet();
+      }
+    };
+    init();
+  }, [wallet, signer, isOnNetwork, isConnected]);
+
   const initXmtpWithKeys = async function () {
     if (!signer) {
       handleLogout();
@@ -413,6 +412,7 @@ export const loadKeys = (walletAddress) => {
 };
 
 export const storeKeys = (walletAddress, keys) => {
+  localStorage.setItem("onboarding", "true");
   localStorage.setItem(
     buildLocalStorageKey(walletAddress),
     Buffer.from(keys).toString(ENCODING),
