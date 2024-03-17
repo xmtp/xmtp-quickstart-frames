@@ -3,6 +3,12 @@ const styles = {
     display: "flex",
     flexDirection: "column",
   },
+  notSupported: {
+    fontSize: "10px",
+    textAlign: "center",
+    width: "100%",
+    display: "block",
+  },
   buttonRow: {
     display: "flex",
     justifyContent: "space-between",
@@ -125,29 +131,25 @@ export const Frame = ({
         style={styles.imageFrameA}>
         <img src={image} alt={title} style={styles.imageFrame} />
       </a>
-      {interactionsEnabled && (
-        <>
-          {textInput !== undefined && (
-            <input
-              type="text"
-              placeholder={textInput}
-              onChange={onTextInputChange}
-              style={styles.textInput}
-            />
-          )}
-          <div style={styles.buttonContainer}>
-            <ButtonGroup
-              buttons={buttons}
-              handleClick={handleClick}
-              frameButtonUpdating={frameButtonUpdating}
-            />
-          </div>
-        </>
+      {textInput !== undefined && (
+        <input
+          type="text"
+          placeholder={textInput}
+          onChange={onTextInputChange}
+          style={styles.textInput}
+        />
       )}
+      <div style={styles.buttonContainer}>
+        <ButtonGroup
+          buttons={buttons}
+          handleClick={handleClick}
+          frameButtonUpdating={frameButtonUpdating}
+        />
+      </div>
       {!interactionsEnabled && (
-        <div style={styles.buttonContainer}>
-          <span>Frame interactions not supported</span>
-        </div>
+        <span style={styles.notSupported}>
+          Frame not fully supported by XMTP
+        </span>
       )}
     </>
   );

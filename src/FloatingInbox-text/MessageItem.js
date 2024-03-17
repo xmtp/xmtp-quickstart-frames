@@ -186,7 +186,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
             buttons={getOrderedButtons(frameMetadata)}
             handleClick={handleFrameButtonClick}
             frameButtonUpdating={frameButtonUpdating}
-            interactionsEnabled={true /*isXmtpFrame(frameMetadata)*/}
+            interactionsEnabled={isXmtpFrame(frameMetadata)}
             textInput={frameMetadata?.frameInfo?.textInput?.content}
             onTextInputChange={onTextInputChange}
             frameUrl={frameMetadata?.url} // Add this line to pass the frame URL
