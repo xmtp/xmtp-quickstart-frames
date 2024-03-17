@@ -337,17 +337,19 @@ export function FloatingInbox({
                   </button>
                 )}
                 <h4 style={styles.conversationHeaderH4}>Conversations</h4>
-                <div
-                  style={styles.label}
-                  onClick={() => {
-                    navigator.clipboard.writeText(address);
-                    alert("Address copied to clipboard");
-                  }}>
-                  {address?.substring(0, 7) +
-                    "..." +
-                    address?.substring(address?.length - 5)}{" "}
-                  📋
-                </div>
+                {isFullScreen && (
+                  <div
+                    style={styles.label}
+                    onClick={() => {
+                      navigator.clipboard.writeText(address);
+                      alert("Address copied to clipboard");
+                    }}>
+                    {address?.substring(0, 7) +
+                      "..." +
+                      address?.substring(address?.length - 5)}{" "}
+                    📋
+                  </div>
+                )}
               </div>
             </div>
           )}
