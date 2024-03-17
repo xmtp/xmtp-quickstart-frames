@@ -7,7 +7,7 @@ import {
   isXmtpFrame,
 } from "../Frames/FrameInfo";
 import { FramesClient } from "@xmtp/frames-client";
-import { readMetadata } from "../Frames/openFrames"; // Ensure you have this helper or implement it
+import { fetchFrameFromUrl } from "../Frames/utils"; // Ensure you have this helper or implement it
 
 export const MessageItem = ({ message, senderAddress, client }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -101,6 +101,9 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       }
       setFrameButtonUpdating(0);
     } catch (e) {
+      setShowAlert(true);
+      setAlertMessage(e.message);
+      //alert("Error: " + e.message);
       console.error(e);
     }
   };
@@ -108,33 +111,9 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   useEffect(() => {
     const fetchMetadata = async () => {
       setIsLoading(true);
-      //Render localhost frames
-      /*if (message.content.includes("localhost")) {
-        const metadata = await readMetadata(message.content); // Ensure you have implemented this function
-        if (metadata) {
-          setFrameMetadata(metadata);
-        }
-      }*/
-      if (typeof message.content === "string") {
-        const words = message.content.split(/(\r?\n|\s+)/);
-        const urlRegex =
-          /^(http[s]?:\/\/)?([a-z0-9.-]+\.[a-z0-9]{1,}\/.*|[a-z0-9.-]+\.[a-z0-9]{1,})$/i;
-        try {
-          await Promise.all(
-            words.map(async (word) => {
-              const isUrl = !!word.match(urlRegex)?.[0];
-              if (isUrl) {
-                const metadata = await readMetadata(word); // Ensure you have implemented this function
-                if (metadata) {
-                  setFrameMetadata(metadata);
-                }
-              }
-            }),
-          );
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      const metadata = await fetchFrameFromUrl(message);
+      console.log("metadata", metadata);
+      setFrameMetadata(metadata);
       setIsLoading(false);
     };
     fetchMetadata();
@@ -169,6 +148,8 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     );
   };
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const isSender = senderAddress === client?.address;
   const showFrame = isValidFrame(frameMetadata);
 
@@ -180,12 +161,16 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       {isLoading && <div style={styles.renderedMessage}>{"Loading..."}</div>}
       {showFrame && !isLoading && frameMetadata?.frameInfo && (
         <div style={styles.messageContent}>
+          {alertMessage}
           <Frame
             image={frameMetadata?.frameInfo?.image.content}
             title={getFrameTitle(frameMetadata)}
             buttons={getOrderedButtons(frameMetadata)}
             handleClick={handleFrameButtonClick}
             frameButtonUpdating={frameButtonUpdating}
+            showAlert={showAlert}
+            alertMessage={alertMessage}
+            onClose={() => setShowAlert(false)}
             interactionsEnabled={isXmtpFrame(frameMetadata)}
             textInput={frameMetadata?.frameInfo?.textInput?.content}
             onTextInputChange={onTextInputChange}
