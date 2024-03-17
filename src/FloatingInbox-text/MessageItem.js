@@ -177,7 +177,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       style={isSender ? styles.senderMessage : styles.receiverMessage}
       key={message.id}>
       {!frameMetadata?.frameInfo && renderMessage(message)}
-      {isLoading && <div>Loading...</div>}
+      {isLoading && <div style={styles.renderedMessage}>{"Loading..."}</div>}
       {showFrame && !isLoading && frameMetadata?.frameInfo && (
         <div style={styles.messageContent}>
           <Frame
