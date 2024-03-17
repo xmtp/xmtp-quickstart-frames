@@ -38,7 +38,7 @@ export const MessageContainer = ({
     },
     peerAddressContainerLabel: {
       margin: "0px",
-      fontSize: "12px",
+      fontSize: "10px",
       padding: "5px",
     },
     peerAddressContainerhref: {

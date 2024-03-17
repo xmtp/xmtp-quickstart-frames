@@ -98,6 +98,7 @@ export const ConversationContainer = ({
       padding: "5px",
       borderRadius: "5px",
       color: "white",
+      cursor: "pointer",
       marginTop: "10px",
       textAlign: "center",
       backgroundColor: "rgb(79 70 229)",
@@ -110,10 +111,11 @@ export const ConversationContainer = ({
       border: "0px",
       borderRadius: "5px",
       color: "rgb(79 70 229)",
-      margin: "0 auto", // Add margin to center the button
+      margin: "0 auto",
       marginTop: "10px",
+      cursor: "pointer",
       textAlign: "center",
-      backgroundColor: "transparent", // Transparent background
+      backgroundColor: "transparent",
       borderBotton: "1px solid rgb(79 70 229)",
       fontSize: "10px",
     },
@@ -235,37 +237,37 @@ export const ConversationContainer = ({
                 if (state === true) setCreateNew(false);
               }}
             />
-
-            {loadingNewConv ? ( // Check if loadingNewConv is true
-              <button style={styles.createNewLoading}>Loading...</button> // Display loading message or spinner
-            ) : (
-              <button
-                style={{
-                  ...styles.createNewButtonR,
-                }}
-                onClick={async () => {
-                  setLoadingNewConv(true); // Set loading state to true
-                  try {
-                    const randomWallet = ethers.Wallet.createRandom();
-                    const randomClient = await Client.create(randomWallet, {
-                      env: env,
-                    });
-                    const newConversation =
-                      await client.conversations.newConversation(
-                        randomClient.address,
-                      );
-                    setSelectedConversation(newConversation);
-                    setSearchTerm("");
-                  } catch (error) {
-                    console.error("Failed to create new conversation", error);
-                    // Optionally handle error (e.g., display error message)
-                  } finally {
-                    setLoadingNewConv(false); // Reset loading state regardless of outcome
-                  }
-                }}>
-                Create new random conversation
-              </button>
-            )}
+            {!searchTerm &&
+              (loadingNewConv ? ( // Check if loadingNewConv is true
+                <button style={styles.createNewButtonR}>Loading...</button> // Display loading message or spinner
+              ) : (
+                <button
+                  style={{
+                    ...styles.createNewButtonR,
+                  }}
+                  onClick={async () => {
+                    setLoadingNewConv(true); // Set loading state to true
+                    try {
+                      const randomWallet = ethers.Wallet.createRandom();
+                      const randomClient = await Client.create(randomWallet, {
+                        env: env,
+                      });
+                      const newConversation =
+                        await client.conversations.newConversation(
+                          randomClient.address,
+                        );
+                      setSelectedConversation(newConversation);
+                      setSearchTerm("");
+                    } catch (error) {
+                      console.error("Failed to create new conversation", error);
+                      // Optionally handle error (e.g., display error message)
+                    } finally {
+                      setLoadingNewConv(false); // Reset loading state regardless of outcome
+                    }
+                  }}>
+                  Create random conversation
+                </button>
+              ))}
           </>
         )}
         {message && conversationFound !== true && (
