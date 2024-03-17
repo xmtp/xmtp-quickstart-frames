@@ -47,7 +47,6 @@ const AlertComponent = ({ show, onClose, message }) => {
     <div style={styles.container}>
       <div style={styles.title}>⚠️</div>
       <div style={styles.desc}>Error: {message}</div>
-
       <small style={styles.notSupported}>
         Your frame may not be compatible with{" "}
         <a

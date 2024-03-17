@@ -28,7 +28,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       borderRadius: "5px",
       maxWidth: "80%",
       wordBreak: "break-word",
-      cursor: "pointer",
       listStyle: "none",
     },
     renderedMessage: {
@@ -112,7 +111,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     const fetchMetadata = async () => {
       setIsLoading(true);
       const metadata = await fetchFrameFromUrl(message);
-      console.log("metadata", metadata);
       setFrameMetadata(metadata);
       setIsLoading(false);
     };
@@ -158,10 +156,11 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       style={isSender ? styles.senderMessage : styles.receiverMessage}
       key={message.id}>
       {!frameMetadata?.frameInfo && renderMessage(message)}
-      {isLoading && <div style={styles.renderedMessage}>{"Loading..."}</div>}
-      {showFrame && !isLoading && frameMetadata?.frameInfo && (
+      {showFrame && frameMetadata?.frameInfo && (
         <div style={styles.messageContent}>
-          {alertMessage}
+          {isLoading && (
+            <div style={styles.renderedMessage}>{"Loading..."}</div>
+          )}
           <Frame
             image={frameMetadata?.frameInfo?.image.content}
             title={getFrameTitle(frameMetadata)}

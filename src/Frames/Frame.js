@@ -41,6 +41,7 @@ export const Frame = ({
       maxWidth: "300px",
       bottom: "0",
       right: "0",
+      height: "auto",
       display: "block",
     },
     imageFrame: {
@@ -60,7 +61,6 @@ export const Frame = ({
 
   return (
     <>
-      {showAlert}
       <AlertComponent
         show={showAlert}
         onClose={onClose}

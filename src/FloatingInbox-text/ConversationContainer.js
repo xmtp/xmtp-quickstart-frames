@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
+import { Client } from "@xmtp/xmtp-js";
 import { ListConversations } from "./ListConversations";
 import { ListConversations as ListConversationsConsent } from "./ListConversations-consent";
 import { MessageContainer } from "./MessageContainer";
 
 export const ConversationContainer = ({
   client,
+  env,
   selectedConversation,
   updateSearchTerm,
   setSelectedConversation,
@@ -101,6 +103,19 @@ export const ConversationContainer = ({
       backgroundColor: "rgb(79 70 229)",
       margin: "0 auto",
       fontSize: "14px",
+    },
+    createNewButtonR: {
+      display: "block",
+      padding: "5px",
+      border: "0px",
+      borderRadius: "5px",
+      color: "rgb(79 70 229)",
+      margin: "0 auto", // Add margin to center the button
+      marginTop: "10px",
+      textAlign: "center",
+      backgroundColor: "transparent", // Transparent background
+      borderBotton: "1px solid rgb(79 70 229)",
+      fontSize: "10px",
     },
     messageClass: {
       textAlign: "center",
@@ -208,17 +223,50 @@ export const ConversationContainer = ({
             }}
           />
         ) : (
-          <ListConversations
-            isPWA={isPWA}
-            client={client}
-            isFullScreen={isFullScreen}
-            searchTerm={searchTerm}
-            selectConversation={setSelectedConversation}
-            onConversationFound={(state) => {
-              setConversationFound(state);
-              if (state === true) setCreateNew(false);
-            }}
-          />
+          <>
+            <ListConversations
+              isPWA={isPWA}
+              client={client}
+              isFullScreen={isFullScreen}
+              searchTerm={searchTerm}
+              selectConversation={setSelectedConversation}
+              onConversationFound={(state) => {
+                setConversationFound(state);
+                if (state === true) setCreateNew(false);
+              }}
+            />
+
+            {loadingNewConv ? ( // Check if loadingNewConv is true
+              <button style={styles.createNewLoading}>Loading...</button> // Display loading message or spinner
+            ) : (
+              <button
+                style={{
+                  ...styles.createNewButtonR,
+                }}
+                onClick={async () => {
+                  setLoadingNewConv(true); // Set loading state to true
+                  try {
+                    const randomWallet = ethers.Wallet.createRandom();
+                    const randomClient = await Client.create(randomWallet, {
+                      env: env,
+                    });
+                    const newConversation =
+                      await client.conversations.newConversation(
+                        randomClient.address,
+                      );
+                    setSelectedConversation(newConversation);
+                    setSearchTerm("");
+                  } catch (error) {
+                    console.error("Failed to create new conversation", error);
+                    // Optionally handle error (e.g., display error message)
+                  } finally {
+                    setLoadingNewConv(false); // Reset loading state regardless of outcome
+                  }
+                }}>
+                Create new random conversation
+              </button>
+            )}
+          </>
         )}
         {message && conversationFound !== true && (
           <small style={styles.messageClass}>{message}</small>

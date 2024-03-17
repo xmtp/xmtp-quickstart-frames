@@ -1,7 +1,6 @@
 import { readMetadata } from "./openFrames";
 
 export const fetchFrameFromUrl = async (message) => {
-  console.log("message", message.content);
   if (typeof message.content === "string") {
     const words = message.content.split(/(\r?\n|\s+)/);
     const urlRegex =

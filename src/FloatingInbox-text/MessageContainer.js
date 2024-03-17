@@ -163,9 +163,23 @@ export const MessageContainer = ({
   }, [conversation]);
 
   useEffect(() => {
-    if (!isContained)
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    let count = 0;
+    if (!isContained) {
+      const interval = setInterval(() => {
+        if (count < 5) {
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+          count++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 1000); // Repeat every second, up to 5 times
+      return () => clearInterval(interval);
+    }
+  }, [messages, isContained]);
 
   const handleSendMessage = async (newMessage) => {
     if (!newMessage.trim()) {
@@ -189,16 +203,29 @@ export const MessageContainer = ({
         <>
           {isFullScreen && (
             <div style={styles.peerAddressContainer}>
-              <p style={styles.peerAddressContainerLabel}>
-                To:{" "}
-                <a
-                  href={window.location.href + "dm/" + conversation.peerAddress}
-                  style={styles.peerAddressContainerhref}
-                  target="_blank"
-                  rel="noreferrer">
-                  {conversation.peerAddress}
-                </a>
-              </p>
+              <div style={styles.peerAddressContainerLabel}>
+                To: {conversation.peerAddress}
+                <div
+                  onClick={() => {
+                    window.open(
+                      window.location.href + "dm/" + conversation.peerAddress,
+                      "_blank",
+                    );
+                  }}
+                  style={{ display: "inline", cursor: "pointer" }}>
+                  {" "}
+                  🔗
+                </div>
+                <div
+                  onClick={() => {
+                    navigator.clipboard.writeText(conversation.peerAddress);
+                    alert("Address copied to clipboard");
+                  }}
+                  style={{ display: "inline", cursor: "pointer" }}>
+                  {" "}
+                  📋
+                </div>
+              </div>
             </div>
           )}
           <ul style={styles.messagesList}>

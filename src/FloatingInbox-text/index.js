@@ -280,7 +280,7 @@ export function FloatingInbox({
     let keys = loadKeys(address);
 
     const clientOptions = {
-      env: !isFullScreen ? (env ? env : getEnv()) : envSelection,
+      env: env ? env : getEnv(),
     };
 
     if (!keys) {
@@ -400,6 +400,7 @@ export function FloatingInbox({
             {!isFullScreen && isConnected && isOnNetwork && client && (
               <ConversationContainer
                 isPWA={isPWA}
+                env={env ? env : getEnv()}
                 client={client}
                 isFullScreen={isFullScreen}
                 isConsent={isConsent}
@@ -414,6 +415,7 @@ export function FloatingInbox({
                 <div style={{ flex: 1, overflowY: "auto", maxWidth: "450px" }}>
                   <ConversationContainer
                     isPWA={isPWA}
+                    env={env ? env : getEnv()}
                     client={client}
                     isConsent={isConsent}
                     isFullScreen={isFullScreen}
