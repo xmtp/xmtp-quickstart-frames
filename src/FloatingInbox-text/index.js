@@ -165,7 +165,7 @@ export function FloatingInbox({
 
     if (typeof window.ethereum !== "undefined") {
       try {
-        await window.ethereum.enable();
+        await window.ethereum.request({ method: "eth_requestAccounts" });
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         setSigner(signer);
