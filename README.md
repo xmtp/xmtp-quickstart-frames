@@ -13,8 +13,8 @@ yarn start
 
 Below are the URLs for accessing XMTP in different network environments.
 
-- Production Network [dev-inbox](https://xmtp-web.vercel.app/)
-- Dev Network [dev-dev-inbox](https://dev-xmtp-web.vercel.app/)
+- Production Network [dev-inbox](https://dev-inbox.vercel.app/)
+- Dev Network [dev-dev-inbox](https://dev-dev-inbox.vercel.app/)
 
 ## Features
 
