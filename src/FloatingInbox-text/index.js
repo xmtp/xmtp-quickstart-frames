@@ -84,6 +84,10 @@ export function FloatingInbox({
     widgetHeader: {
       padding: "2px",
     },
+    labelRight: {
+      textAlign: "right",
+      fontSize: "10px",
+    },
     label: {
       fontSize: "10px",
       textAlign: "center",
@@ -325,8 +329,15 @@ export function FloatingInbox({
             </button>
           )}
           {isConnected && isOnNetwork && (
-            <div style={styles.widgetHeader}>
-              <div style={styles.conversationHeader}>
+            <div
+              style={{
+                ...styles.widgetHeader,
+                display: "flex",
+                justifyContent: "space-between",
+              }}>
+              <div style={{ flex: 1 }}>
+                {" "}
+                {/* Left content */}
                 {isOnNetwork && selectedConversation && !isFullScreen && (
                   <button
                     style={styles.backButton}
@@ -336,15 +347,24 @@ export function FloatingInbox({
                     ←
                   </button>
                 )}
+              </div>
+              <div style={{ flex: 1, textAlign: "center" }}>
+                {" "}
+                {/* Middle content */}
                 <h4 style={styles.conversationHeaderH4}>Conversations</h4>
+              </div>
+              <div style={{ flex: 1, textAlign: "right" }}>
+                {" "}
+                {/* Right content */}
                 {isFullScreen && (
                   <div
-                    style={styles.label}
+                    style={styles.labelRight}
                     onClick={() => {
                       navigator.clipboard.writeText(address);
                       alert("Address copied to clipboard");
                     }}>
-                    {address?.substring(0, 7) +
+                    {"Your address: " +
+                      address?.substring(0, 7) +
                       "..." +
                       address?.substring(address?.length - 5)}{" "}
                     📋
@@ -353,21 +373,9 @@ export function FloatingInbox({
               </div>
             </div>
           )}
-          {isConnected}
           <div style={styles.widgetContent}>
             {!isConnected && (
               <div style={styles.xmtpContainer}>
-                {/*<div>
-                  <label>
-                    Environment:
-                    <select
-                      value={envSelection}
-                      onChange={(e) => setEnvSelection(e.target.value)}>
-                      <option value="production">Production</option>
-                      <option value="dev">Development</option>
-                    </select>
-                  </label>
-            </div>*/}
                 <button style={styles.btnXmtp} onClick={connectWallet}>
                   Connect Wallet
                 </button>

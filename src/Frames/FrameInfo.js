@@ -28,7 +28,7 @@ export function isXmtpFrame(metadata) {
     return false;
   }
   const minXmtpVersion = metadata.frameInfo?.acceptedClients?.xmtp;
-
+  console.log(minXmtpVersion);
   return (
     !!minXmtpVersion &&
     minXmtpVersion.length > 0 &&

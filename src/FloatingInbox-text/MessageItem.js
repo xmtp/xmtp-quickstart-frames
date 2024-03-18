@@ -150,7 +150,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   const [alertMessage, setAlertMessage] = useState("");
   const isSender = senderAddress === client?.address;
   const showFrame = isValidFrame(frameMetadata);
-
+  console.log(frameMetadata);
   return (
     <li
       style={isSender ? styles.senderMessage : styles.receiverMessage}
