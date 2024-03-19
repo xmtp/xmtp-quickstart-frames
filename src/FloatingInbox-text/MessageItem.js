@@ -145,7 +145,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       </div>
     );
   };
-
+  console.log("isXmtpFrame", frameMetadata?.url, isXmtpFrame(frameMetadata));
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const isSender = senderAddress === client?.address;

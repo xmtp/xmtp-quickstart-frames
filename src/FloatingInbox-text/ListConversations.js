@@ -202,7 +202,7 @@ export const ListConversations = ({
               selectConversation(conversation);
               setSelectedConversation(conversation.peerAddress);
             }}>
-            <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />
+            {/*<img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />*/}
             <div style={styles.conversationDetails}>
               <span style={styles.conversationName}>
                 {conversation.peerAddress.substring(0, 7) +
