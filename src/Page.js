@@ -123,7 +123,7 @@ const InboxPage = ({
               className="home-button"
               style={{ ...styles.ButtonStyledStyle, marginLeft: 10 }}
               onClick={() => disconnectWallet()}>
-              Logout
+              ⏏
             </button>
           )}
           <h1>Quickstart Inbox </h1>
