@@ -12,7 +12,7 @@ code {
     monospace;
 }
 
-@media (max-width: 1068px) {
+@media (max-width: 768px) {
   .messageInputField {
     font-size: 20px !important;
     padding: 10px !important;
