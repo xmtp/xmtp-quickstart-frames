@@ -114,6 +114,8 @@ export function FloatingInbox({
       background: "transparent",
       cursor: "pointer",
       fontSize: isPWA == true ? "20px" : "14px", // Increased font size
+      display: "inline-block",
+      fontSize: "14px",
     },
     widgetContent: {
       flexGrow: 1,
@@ -335,23 +337,19 @@ export function FloatingInbox({
                 display: "flex",
                 justifyContent: "space-between",
               }}>
-              <div style={{ flex: 1 }}>
-                {" "}
-                {/* Left content */}
-                {isOnNetwork && selectedConversation && !isFullScreen && (
-                  <button
-                    style={styles.backButton}
-                    onClick={() => {
-                      setSelectedConversation(null);
-                    }}>
-                    ←
-                  </button>
-                )}
-              </div>
+              <div style={{ flex: 1 }}></div>
               <div style={{ flex: 1, textAlign: "center" }}>
-                {" "}
-                {/* Middle content */}
-                <h4 style={styles.conversationHeaderH4}>Conversations</h4>
+                <h4 style={styles.conversationHeaderH4}>
+                  {isOnNetwork && selectedConversation && !isFullScreen ? (
+                    <button
+                      style={styles.backButton}
+                      onClick={() => setSelectedConversation(null)}>
+                      ← Conversations
+                    </button>
+                  ) : (
+                    <span>Conversations</span>
+                  )}
+                </h4>
               </div>
               <div style={{ flex: 1, textAlign: "right" }}>
                 {" "}
