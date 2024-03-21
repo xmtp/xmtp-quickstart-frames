@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+@media (max-width: 1068px) {
+  .messageInputField {
+    font-size: 20px !important;
+    padding: 10px !important;
+    width: 70% !important;
+  }
+  .sendButton {
+    font-size: 20px !important;
+    width: 20% !important;
+  }
+}

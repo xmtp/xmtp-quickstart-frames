@@ -52,6 +52,7 @@ export const MessageInput = ({
   return (
     <div style={styles.newMessageContainer}>
       <input
+        className="messageInputField"
         style={styles.messageInputField}
         type="text"
         value={newMessage}
@@ -60,6 +61,7 @@ export const MessageInput = ({
         placeholder="Type your message..."
       />
       <button
+        className="sendButton"
         style={styles.sendButton}
         onClick={() => {
           onSendMessage(newMessage);
