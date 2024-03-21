@@ -84,9 +84,6 @@ export const ListConversations = ({
       setLoading(false);
       stream = await client.conversations.stream();
       for await (const conversation of stream) {
-        console.log(
-          `New conversation started with ${conversation.peerAddress}`,
-        );
         if (isMounted) {
           setConversations((prevConversations) => {
             const newConversations = [...prevConversations, conversation];
@@ -115,7 +112,6 @@ export const ListConversations = ({
     const fetchLastMessages = async () => {
       try {
         const messages = [];
-        console.log("conversations fetched", conversations.length);
         if (conversations.length > 100) {
           console.warn(
             "Notice: This app is not optimized for performance with a high number of conversations. For a better experience, try with wallets that have fewer conversations.",
@@ -125,7 +121,7 @@ export const ListConversations = ({
           const conversationMessages = await conversation.messages();
           const content =
             conversationMessages[conversationMessages.length - 1]?.content;
-          console.log(content);
+
           messages.push(
             conversationMessages[conversationMessages.length - 1]?.content,
           );
