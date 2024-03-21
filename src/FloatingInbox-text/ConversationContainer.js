@@ -133,6 +133,7 @@ export const ConversationContainer = ({
   };
 
   const selectConversation = async (conversation) => {
+    console.log("selectConversation", conversation.peerAddress);
     setSelectedConversation(conversation);
   };
 

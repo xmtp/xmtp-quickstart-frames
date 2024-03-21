@@ -14,7 +14,11 @@ export const ListConversations = ({
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
-
+  useEffect(() => {
+    if (selectedConversation) {
+      navigate(`/dm/${selectedConversation}`);
+    }
+  }, [selectedConversation, navigate]);
   const styles = {
     conversationListItem: {
       display: "flex",
