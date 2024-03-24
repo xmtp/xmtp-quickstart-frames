@@ -109,11 +109,13 @@ export const ConversationContainer = ({
       display: "block",
       padding: "5px",
       border: "0px",
+      cursor: "pointer",
       borderRadius: "5px",
       color: "rgb(79 70 229)",
       margin: "0 auto",
+      marginLeft: "6px",
       cursor: "pointer",
-      textAlign: "center",
+      textAlign: "left",
       backgroundColor: "transparent",
       borderBotton: "1px solid rgb(79 70 229)",
       fontSize: "10px",
@@ -242,7 +244,7 @@ export const ConversationContainer = ({
                   setLoadingNewConv(false); // Reset loading state regardless of outcome
                 }
               }}>
-              Create random conversation
+              Or create random conversation
             </button>
           ))}
         {isConsent ? (
