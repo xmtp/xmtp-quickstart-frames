@@ -127,7 +127,6 @@ export const MessageContainer = ({
     // Refresh the consent list
     await client.contacts.refreshConsentList();
     // Log the acceptance
-    console.log("accepted", conversation.peerAddress);
   };
 
   // Function to handle the blocking of a contact
@@ -139,13 +138,11 @@ export const MessageContainer = ({
     // Refresh the consent list
     await client.contacts.refreshConsentList();
     // Log the blocking
-    console.log("denied", conversation.peerAddress);
   };
   const startMessageStream = async () => {
     try {
       let stream = await conversation?.streamMessages();
       for await (const message of stream) {
-        console.log(message.senderAddress, message.content);
         setMessages((prevMessages) => {
           return updateMessages(prevMessages, message);
         });

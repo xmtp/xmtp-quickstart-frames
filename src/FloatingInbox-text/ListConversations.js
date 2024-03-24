@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export const ListConversations = ({
   searchTerm,
@@ -10,16 +11,23 @@ export const ListConversations = ({
   isPWA = false,
   isFullScreen = false,
 }) => {
+  // Inside your ListConversations component
+  const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
-  useEffect(() => {
-    if (selectedConversation) {
-      navigate(`/dm/${selectedConversation}`);
-      //dms for refresh
+
+  const hightlightConversation = (conversation) => {
+    console.log("hightlightConversation", conversation.peerAddress);
+    selectConversation(conversation);
+    setSelectedConversation(conversation.peerAddress);
+    if (conversation.peerAddress) {
+      navigate(`/dm/${conversation.peerAddress}`, {
+        replace: true,
+      });
     }
-  }, [selectedConversation, navigate]);
+  };
   const styles = {
     conversationListItem: {
       display: "flex",
@@ -131,7 +139,6 @@ export const ListConversations = ({
             conversationMessages[conversationMessages.length - 1]?.content,
           );
         }
-        console.log("setLastMessages updated", messages.length);
         setLastMessages(messages);
       } catch (error) {
         console.error("Failed to fetch last messages:", error);
@@ -144,6 +151,15 @@ export const ListConversations = ({
   }, [conversations]);
 
   useEffect(() => {
+    if (selectedConversation) {
+      navigate(`/dm/${selectedConversation}`, {
+        replace: true,
+      });
+      //dms for refresh
+    }
+  }, [selectedConversation, navigate]);
+
+  useEffect(() => {
     const path = window.location.pathname;
     const match = path.match(/\/dm\/(0x[a-fA-F0-9]{40})/); // Adjust regex as needed
     if (match) {
@@ -152,18 +168,17 @@ export const ListConversations = ({
         (conv) => conv.peerAddress === address,
       );
       if (conversationToSelect) {
-        selectConversation(conversationToSelect);
-        setSelectedConversation(conversationToSelect?.peerAddress);
-        navigate("", { replace: true });
+        hightlightConversation(conversationToSelect);
       } else {
         console.log("No conversation found with address:", address);
       }
     } else if (conversations.length > 0 && isFullScreen) {
       // If no deep linking match, select the first conversation
-      selectConversation(conversations[0]);
-      setSelectedConversation(conversations[0]?.peerAddress);
+      hightlightConversation(conversations[0]);
     }
-  }, [conversations, selectConversation]);
+  }, [conversations, location.pathname, selectConversation]);
+
+  useEffect(() => {}, [selectedConversation]);
 
   const filteredConversations = conversations.filter(
     (conversation) =>
@@ -200,11 +215,11 @@ export const ListConversations = ({
                   : styles.conversationListItem.backgroundColor,
             }}
             onClick={() => {
-              selectConversation(conversation);
-              setSelectedConversation(conversation.peerAddress);
+              hightlightConversation(conversation);
             }}>
             {/*<img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />*/}
             <div style={styles.conversationDetails}>
+              {selectConversation.peerAddress}
               <span style={styles.conversationName}>
                 {conversation.peerAddress.substring(0, 7) +
                   "..." +

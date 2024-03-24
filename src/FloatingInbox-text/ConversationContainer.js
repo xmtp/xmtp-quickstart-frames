@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Client } from "@xmtp/xmtp-js";
 import { ListConversations } from "./ListConversations";
 import { ListConversations as ListConversationsConsent } from "./ListConversations-consent";
 import { MessageContainer } from "./MessageContainer";
+import { useNavigate } from "react-router-dom";
 
 export const ConversationContainer = ({
   client,
@@ -16,6 +17,7 @@ export const ConversationContainer = ({
   isPWA = false,
   isConsent = false,
 }) => {
+  const navigate = useNavigate();
   // Existing state declarations
   const [loadingNewConv, setLoadingNewConv] = useState(false); // Add this line for new conversation loading state
   const [searchTerm, setSearchTerm] = useState("");
@@ -113,9 +115,8 @@ export const ConversationContainer = ({
       borderRadius: "5px",
       color: "rgb(79 70 229)",
       margin: "0 auto",
-      marginLeft: "6px",
       cursor: "pointer",
-      textAlign: "left",
+      textAlign: "center",
       backgroundColor: "transparent",
       borderBotton: "1px solid rgb(79 70 229)",
       fontSize: "10px",
@@ -134,7 +135,6 @@ export const ConversationContainer = ({
   };
 
   const selectConversation = async (conversation) => {
-    console.log("selectConversation", conversation.peerAddress);
     setSelectedConversation(conversation);
   };
 
@@ -164,7 +164,6 @@ export const ConversationContainer = ({
         setLoadingResolve(false);
       }
     }
-    console.log("resolvedAddress", resolvedAddress);
     if (resolvedAddress && isValidEthereumAddress(resolvedAddress)) {
       processEthereumAddress(resolvedAddress);
       setSearchTerm(resolvedAddress);
@@ -237,6 +236,11 @@ export const ConversationContainer = ({
                     );
                   setSelectedConversation(newConversation);
                   setSearchTerm("");
+                  if (newConversation?.peerAddress) {
+                    navigate(`/dm/${newConversation?.peerAddress}`, {
+                      replace: true,
+                    });
+                  }
                 } catch (error) {
                   console.error("Failed to create new conversation", error);
                   // Optionally handle error (e.g., display error message)
@@ -290,6 +294,11 @@ export const ConversationContainer = ({
                       await client.conversations.newConversation(peerAddress);
                     setSelectedConversation(newConversation);
                     setSearchTerm("");
+                    if (newConversation?.peerAddress) {
+                      navigate(`/dm/${newConversation?.peerAddress}`, {
+                        replace: true,
+                      });
+                    }
                   } catch (error) {
                     console.error("Failed to create new conversation", error);
                     // Optionally handle error (e.g., display error message)
