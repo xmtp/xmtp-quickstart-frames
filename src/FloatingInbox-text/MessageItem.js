@@ -149,6 +149,23 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   const [alertMessage, setAlertMessage] = useState("");
   const isSender = senderAddress === client?.address;
   const showFrame = isValidFrame(frameMetadata);
+
+  // Existing state declarations...
+  const [isXmtpFrameInitial, setIsXmtpFrameInitial] = useState(false); // Add this line
+
+  // Existing useEffect and other logic...
+
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      setIsLoading(true);
+      const metadata = await fetchFrameFromUrl(message);
+      setFrameMetadata(metadata);
+      setIsXmtpFrameInitial(isXmtpFrame(metadata)); // Set the initial isXmtpFrame value here
+      setIsLoading(false);
+    };
+    fetchMetadata();
+  }, [message?.content]);
+
   return (
     <li
       style={isSender ? styles.senderMessage : styles.receiverMessage}
@@ -168,7 +185,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
             showAlert={showAlert}
             alertMessage={alertMessage}
             onClose={() => setShowAlert(false)}
-            interactionsEnabled={isXmtpFrame(frameMetadata)}
+            interactionsEnabled={isXmtpFrameInitial}
             textInput={frameMetadata?.frameInfo?.textInput?.content}
             onTextInputChange={onTextInputChange}
             frameUrl={frameMetadata?.url} // Add this line to pass the frame URL
