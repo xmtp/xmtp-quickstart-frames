@@ -30,9 +30,8 @@ export function isXmtpFrame(metadata) {
   const minXmtpVersion = metadata.frameInfo?.acceptedClients?.xmtp;
 
   return (
-    !!minXmtpVersion &&
-    minXmtpVersion.length > 0 &&
-    minXmtpVersion <= PROTOCOL_VERSION
+    !!minXmtpVersion && minXmtpVersion.length > 0 /* &&
+    minXmtpVersion <= PROTOCOL_VERSION*/
   );
 }
 
