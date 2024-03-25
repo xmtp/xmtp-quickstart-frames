@@ -106,12 +106,15 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       console.error(e);
     }
   };
+  const [isXmtpFrameInitial, setIsXmtpFrameInitial] = useState(false); // Add this line
 
   useEffect(() => {
     const fetchMetadata = async () => {
       setIsLoading(true);
       const metadata = await fetchFrameFromUrl(message);
       setFrameMetadata(metadata);
+      setIsXmtpFrameInitial(isXmtpFrame(metadata)); // Set the initial isXmtpFrame value here
+
       setIsLoading(false);
     };
     fetchMetadata();
@@ -149,23 +152,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   const [alertMessage, setAlertMessage] = useState("");
   const isSender = senderAddress === client?.address;
   const showFrame = isValidFrame(frameMetadata);
-
-  // Existing state declarations...
-  const [isXmtpFrameInitial, setIsXmtpFrameInitial] = useState(false); // Add this line
-
-  // Existing useEffect and other logic...
-
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      setIsLoading(true);
-      const metadata = await fetchFrameFromUrl(message);
-      setFrameMetadata(metadata);
-      setIsXmtpFrameInitial(isXmtpFrame(metadata)); // Set the initial isXmtpFrame value here
-      setIsLoading(false);
-    };
-    fetchMetadata();
-  }, [message?.content]);
-
   return (
     <li
       style={isSender ? styles.senderMessage : styles.receiverMessage}
