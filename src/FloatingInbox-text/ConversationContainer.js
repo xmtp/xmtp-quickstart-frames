@@ -38,6 +38,7 @@ export const ConversationContainer = ({
       margin: "0",
       listStyle: "none",
       overflowY: "scroll",
+      "-webkit-overflow-scrolling": "touch", // Let it scroll on iOS
     },
     conversationListItem: {
       display: "flex",

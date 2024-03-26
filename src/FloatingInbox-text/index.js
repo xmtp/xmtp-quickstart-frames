@@ -343,7 +343,7 @@ export function FloatingInbox({
               }}>
               <div style={{ flex: 1 }}></div>
               <div
-                style={{ width: "80%", textAlign: "center", margin: "0 auto" }}>
+                style={{ width: "50%", textAlign: "center", margin: "0 auto" }}>
                 <h4 style={styles.conversationHeaderH4}>
                   {isOnNetwork && selectedConversation && !isFullScreen ? (
                     <button
