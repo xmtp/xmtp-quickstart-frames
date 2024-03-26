@@ -14,12 +14,12 @@ code {
 
 @media (max-width: 768px) {
   .messageInputField {
-    font-size: 20px !important;
-    padding: 10px !important;
+    font-size: 15px !important;
+    padding: 8px !important;
     width: 70% !important;
   }
   .sendButton {
-    font-size: 20px !important;
+    font-size: 15px !important;
     width: 20% !important;
   }
 }

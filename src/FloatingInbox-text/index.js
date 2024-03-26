@@ -3,6 +3,8 @@ import { Client } from "@xmtp/xmtp-js";
 import { ethers } from "ethers";
 import { ConversationContainer } from "./ConversationContainer";
 import { MessageContainer } from "./MessageContainer";
+import { useNavigate } from "react-router-dom";
+
 export function FloatingInbox({
   wallet,
   env,
@@ -12,6 +14,7 @@ export function FloatingInbox({
   isContained = false,
   isConsent = false,
 }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isOnNetwork, setIsOnNetwork] = useState(false);
   const [client, setClient] = useState();
@@ -19,7 +22,6 @@ export function FloatingInbox({
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [signer, setSigner] = useState();
   const [isWalletCreated, setIsWalletCreated] = useState(false);
-  const [envSelection, setEnvSelection] = useState("production"); // Default to 'production'
   // Add searchTerm state in FloatingInbox component
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -237,6 +239,7 @@ export function FloatingInbox({
     setIsOnNetwork(false);
     setClient(null);
     setSelectedConversation(null);
+    navigate(`/`);
     localStorage.removeItem("isOnNetwork");
     localStorage.removeItem("isConnected");
     localStorage.removeItem("walletAddress");
@@ -338,12 +341,16 @@ export function FloatingInbox({
                 justifyContent: "space-between",
               }}>
               <div style={{ flex: 1 }}></div>
-              <div style={{ flex: 1, textAlign: "center" }}>
+              <div
+                style={{ width: "80%", textAlign: "center", margin: "0 auto" }}>
                 <h4 style={styles.conversationHeaderH4}>
                   {isOnNetwork && selectedConversation && !isFullScreen ? (
                     <button
                       style={styles.backButton}
-                      onClick={() => setSelectedConversation(null)}>
+                      onClick={() => {
+                        setSelectedConversation(null);
+                        navigate(`/`);
+                      }}>
                       ← Conversations
                     </button>
                   ) : (

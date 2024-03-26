@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { ethers } from "ethers";
 import { Client } from "@xmtp/xmtp-js";
 import { ListConversations } from "./ListConversations";
-import { ListConversations as ListConversationsConsent } from "./ListConversations-consent";
 import { MessageContainer } from "./MessageContainer";
 import { useNavigate } from "react-router-dom";
 
@@ -214,7 +213,6 @@ export const ConversationContainer = ({
           style={styles.peerAddressInput}
         />
         {loadingResolve && searchTerm && <small>Resolving address...</small>}
-
         {!searchTerm &&
           (loadingNewConv ? ( // Check if loadingNewConv is true
             <button style={styles.createNewButtonR}>Loading...</button> // Display loading message or spinner
@@ -237,9 +235,7 @@ export const ConversationContainer = ({
                   setSelectedConversation(newConversation);
                   setSearchTerm("");
                   if (newConversation?.peerAddress) {
-                    navigate(`/dm/${newConversation?.peerAddress}`, {
-                      replace: true,
-                    });
+                    navigate(`/dm/${newConversation?.peerAddress}`, {});
                   }
                 } catch (error) {
                   console.error("Failed to create new conversation", error);
@@ -251,32 +247,17 @@ export const ConversationContainer = ({
               Or create random conversation
             </button>
           ))}
-        {isConsent ? (
-          <ListConversationsConsent
-            isPWA={isPWA}
-            client={client}
-            searchTerm={searchTerm}
-            selectConversation={setSelectedConversation}
-            onConversationFound={(state) => {
-              setConversationFound(state);
-              if (state === true) setCreateNew(false);
-            }}
-          />
-        ) : (
-          <>
-            <ListConversations
-              isPWA={isPWA}
-              client={client}
-              isFullScreen={isFullScreen}
-              searchTerm={searchTerm}
-              selectConversation={setSelectedConversation}
-              onConversationFound={(state) => {
-                setConversationFound(state);
-                if (state === true) setCreateNew(false);
-              }}
-            />
-          </>
-        )}
+        <ListConversations
+          isPWA={isPWA}
+          client={client}
+          isFullScreen={isFullScreen}
+          searchTerm={searchTerm}
+          selectConversation={setSelectedConversation}
+          onConversationFound={(state) => {
+            setConversationFound(state);
+            if (state === true) setCreateNew(false);
+          }}
+        />
         {message && conversationFound !== true && (
           <small style={styles.messageClass}>{message}</small>
         )}
@@ -295,9 +276,7 @@ export const ConversationContainer = ({
                     setSelectedConversation(newConversation);
                     setSearchTerm("");
                     if (newConversation?.peerAddress) {
-                      navigate(`/dm/${newConversation?.peerAddress}`, {
-                        replace: true,
-                      });
+                      navigate(`/dm/${newConversation?.peerAddress}`, {});
                     }
                   } catch (error) {
                     console.error("Failed to create new conversation", error);

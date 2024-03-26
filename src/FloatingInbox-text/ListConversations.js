@@ -19,13 +19,10 @@ export const ListConversations = ({
   const [selectedConversation, setSelectedConversation] = useState(null);
 
   const hightlightConversation = (conversation) => {
-    console.log("hightlightConversation", conversation.peerAddress);
     selectConversation(conversation);
     setSelectedConversation(conversation.peerAddress);
     if (conversation.peerAddress) {
-      navigate(`/dm/${conversation.peerAddress}`, {
-        replace: true,
-      });
+      navigate(`/dm/${conversation.peerAddress}`, {});
     }
   };
   const styles = {
@@ -152,9 +149,7 @@ export const ListConversations = ({
 
   useEffect(() => {
     if (selectedConversation) {
-      navigate(`/dm/${selectedConversation}`, {
-        replace: true,
-      });
+      navigate(`/dm/${selectedConversation}`, {});
       //dms for refresh
     }
   }, [selectedConversation, navigate]);
@@ -178,8 +173,6 @@ export const ListConversations = ({
     }
   }, [conversations, location.pathname, selectConversation]);
 
-  useEffect(() => {}, [selectedConversation]);
-
   const filteredConversations = conversations.filter(
     (conversation) =>
       conversation?.peerAddress
@@ -193,6 +186,7 @@ export const ListConversations = ({
       onConversationFound(true);
     }
   }, [filteredConversations, onConversationFound]);
+
   return (
     <>
       {loading ? (
