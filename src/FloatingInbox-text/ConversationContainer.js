@@ -204,75 +204,35 @@ export const ConversationContainer = ({
 
   const renderListConversations = () => {
     return (
-      <ul style={styles.conversationList}>
-        <input
-          type="text"
-          placeholder="Enter a 0x wallet or ENS address"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          style={styles.peerAddressInput}
-        />
-        {loadingResolve && searchTerm && <small>Resolving address...</small>}
-        {!searchTerm &&
-          (loadingNewConv ? ( // Check if loadingNewConv is true
-            <button style={styles.createNewButtonR}>Loading...</button> // Display loading message or spinner
-          ) : (
-            <button
-              style={{
-                ...styles.createNewButtonR,
-              }}
-              onClick={async () => {
-                setLoadingNewConv(true); // Set loading state to true
-                try {
-                  const randomWallet = ethers.Wallet.createRandom();
-                  const randomClient = await Client.create(randomWallet, {
-                    env: env,
-                  });
-                  const newConversation =
-                    await client.conversations.newConversation(
-                      randomClient.address,
-                    );
-                  setSelectedConversation(newConversation);
-                  setSearchTerm("");
-                  if (newConversation?.peerAddress) {
-                    navigate(`/dm/${newConversation?.peerAddress}`, {});
-                  }
-                } catch (error) {
-                  console.error("Failed to create new conversation", error);
-                  // Optionally handle error (e.g., display error message)
-                } finally {
-                  setLoadingNewConv(false); // Reset loading state regardless of outcome
-                }
-              }}>
-              Or create random conversation
-            </button>
-          ))}
-        <ListConversations
-          isPWA={isPWA}
-          client={client}
-          isFullScreen={isFullScreen}
-          searchTerm={searchTerm}
-          selectConversation={setSelectedConversation}
-          onConversationFound={(state) => {
-            setConversationFound(state);
-            if (state === true) setCreateNew(false);
-          }}
-        />
-        {message && conversationFound !== true && (
-          <small style={styles.messageClass}>{message}</small>
-        )}
-        {peerAddress && createNew && !conversationFound && (
-          <>
-            {loadingNewConv ? ( // Check if loadingNewConv is true
-              <button style={styles.createNewLoading}>Loading...</button> // Display loading message or spinner
+      <div style={styles.conversations}>
+        <ul style={styles.conversationList}>
+          <input
+            type="text"
+            placeholder="Enter a 0x wallet or ENS address"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            style={styles.peerAddressInput}
+          />
+          {loadingResolve && searchTerm && <small>Resolving address...</small>}
+          {!searchTerm &&
+            (loadingNewConv ? ( // Check if loadingNewConv is true
+              <button style={styles.createNewButtonR}>Loading...</button> // Display loading message or spinner
             ) : (
               <button
-                style={styles.createNewButton}
+                style={{
+                  ...styles.createNewButtonR,
+                }}
                 onClick={async () => {
                   setLoadingNewConv(true); // Set loading state to true
                   try {
+                    const randomWallet = ethers.Wallet.createRandom();
+                    const randomClient = await Client.create(randomWallet, {
+                      env: env,
+                    });
                     const newConversation =
-                      await client.conversations.newConversation(peerAddress);
+                      await client.conversations.newConversation(
+                        randomClient.address,
+                      );
                     setSelectedConversation(newConversation);
                     setSearchTerm("");
                     if (newConversation?.peerAddress) {
@@ -285,17 +245,58 @@ export const ConversationContainer = ({
                     setLoadingNewConv(false); // Reset loading state regardless of outcome
                   }
                 }}>
-                Create new conversation
+                Or create random conversation
               </button>
-            )}
-          </>
-        )}
-      </ul>
+            ))}
+          <ListConversations
+            isPWA={isPWA}
+            client={client}
+            isFullScreen={isFullScreen}
+            searchTerm={searchTerm}
+            selectConversation={setSelectedConversation}
+            onConversationFound={(state) => {
+              setConversationFound(state);
+              if (state === true) setCreateNew(false);
+            }}
+          />
+          {message && conversationFound !== true && (
+            <small style={styles.messageClass}>{message}</small>
+          )}
+          {peerAddress && createNew && !conversationFound && (
+            <>
+              {loadingNewConv ? ( // Check if loadingNewConv is true
+                <button style={styles.createNewLoading}>Loading...</button> // Display loading message or spinner
+              ) : (
+                <button
+                  style={styles.createNewButton}
+                  onClick={async () => {
+                    setLoadingNewConv(true); // Set loading state to true
+                    try {
+                      const newConversation =
+                        await client.conversations.newConversation(peerAddress);
+                      setSelectedConversation(newConversation);
+                      setSearchTerm("");
+                      if (newConversation?.peerAddress) {
+                        navigate(`/dm/${newConversation?.peerAddress}`, {});
+                      }
+                    } catch (error) {
+                      console.error("Failed to create new conversation", error);
+                      // Optionally handle error (e.g., display error message)
+                    } finally {
+                      setLoadingNewConv(false); // Reset loading state regardless of outcome
+                    }
+                  }}>
+                  Create new conversation
+                </button>
+              )}
+            </>
+          )}
+        </ul>
+      </div>
     );
   };
-
   return (
-    <div style={styles.conversations}>
+    <>
       {isFullScreen ? (
         renderListConversations()
       ) : (
@@ -314,6 +315,6 @@ export const ConversationContainer = ({
           )}
         </>
       )}
-    </div>
+    </>
   );
 };

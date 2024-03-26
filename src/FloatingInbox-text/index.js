@@ -115,7 +115,8 @@ export function FloatingInbox({
       border: "0px",
       background: "transparent",
       cursor: "pointer",
-      fontSize: isPWA === true ? "20px" : "14px", // Increased font size
+      color: "black",
+      fontSize: isPWA === true ? "14px" : "14px", // Increased font size
       display: "inline-block",
       textDecoration: "none",
     },

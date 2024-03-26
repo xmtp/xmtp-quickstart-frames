@@ -27,7 +27,7 @@ export const MessageContainer = ({
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      height: "100%",
+      height: "100%", // Use viewport height to ensure it fits in the screen
     },
     peerAddressContainer: {
       textAlign: "right",
