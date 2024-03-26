@@ -19,8 +19,8 @@ export const MessageInput = ({
       padding: "5px",
       border: "1px solid #ccc",
       borderRadius: "5px",
-      fontSize: isPWA == true ? "12px" : "12px",
-      width: isPWA == true ? "82%" : "",
+      fontSize: isPWA === true ? "12px" : "12px",
+      width: isPWA === true ? "82%" : "",
       outline: "none",
     },
     sendButton: {
@@ -36,8 +36,8 @@ export const MessageInput = ({
       alignItems: "center",
       color: "white",
       height: "100%",
-      fontSize: isPWA == true ? "1.0em" : ".8em",
-      width: isPWA == true ? "12%" : "",
+      fontSize: isPWA === true ? "1.0em" : ".8em",
+      width: isPWA === true ? "12%" : "",
     },
   };
   const handleInputChange = (event) => {

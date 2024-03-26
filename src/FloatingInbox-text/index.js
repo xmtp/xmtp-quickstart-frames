@@ -80,7 +80,7 @@ export function FloatingInbox({
       left: "5px",
       background: "transparent",
       border: "none",
-      fontSize: isPWA == true ? "12px" : "10px",
+      fontSize: isPWA === true ? "12px" : "10px",
       cursor: "pointer",
     },
     widgetHeader: {
@@ -109,15 +109,15 @@ export function FloatingInbox({
     conversationHeaderH4: {
       margin: "0px",
       padding: "4px",
-      fontSize: isPWA == true ? "14px" : "12px", // Increased font size
+      fontSize: isPWA === true ? "14px" : "12px", // Increased font size
     },
     backButton: {
       border: "0px",
       background: "transparent",
       cursor: "pointer",
-      fontSize: isPWA == true ? "20px" : "14px", // Increased font size
+      fontSize: isPWA === true ? "20px" : "14px", // Increased font size
       display: "inline-block",
-      fontSize: "14px",
+      textDecoration: "none",
     },
     widgetContent: {
       flexGrow: 1,

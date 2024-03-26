@@ -37,7 +37,7 @@ export const ListConversations = ({
       backgroundColor: "#f0f0f0",
 
       transition: "background-color 0.3s ease",
-      padding: isPWA == true ? "15px" : "10px",
+      padding: isPWA === true ? "15px" : "10px",
     },
     avatarImage: {
       // New style for the avatar image
@@ -51,22 +51,22 @@ export const ListConversations = ({
       flexDirection: "column",
       alignItems: "flex-start",
       width: "75%",
-      marginLeft: isPWA == true ? "15px" : "10px",
+      marginLeft: isPWA === true ? "15px" : "10px",
       overflow: "hidden",
     },
     conversationName: {
-      fontSize: isPWA == true ? "15px" : "16px",
+      fontSize: isPWA === true ? "15px" : "16px",
       fontWeight: "bold",
     },
     messagePreview: {
-      fontSize: isPWA == true ? "12px" : "12px",
+      fontSize: isPWA === true ? "12px" : "12px",
       color: "#666",
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
     },
     conversationTimestamp: {
-      fontSize: isPWA == true ? "10px" : "10px",
+      fontSize: isPWA === true ? "10px" : "10px",
       color: "#999",
       width: "25%",
       textAlign: "right",
