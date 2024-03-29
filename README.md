@@ -1,6 +1,6 @@
 # XMTP Dev Inbox
 
-Web client intended to be used by hackathon developes. Feel free to fork or clone this repo and fit it to your project!
+Web client intended to be used by hackathon developers. Feel free to fork or clone this repo and fit it to your project!
 
 ## Installation
 
