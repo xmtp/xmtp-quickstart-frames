@@ -34,6 +34,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       fontSize: "12px",
       wordBreak: "break-word",
       padding: "0px",
+      maxWidth: "300px",
     },
     senderMessage: {
       alignSelf: "flex-start",
@@ -135,6 +136,9 @@ export const MessageItem = ({ message, senderAddress, client }) => {
   const renderMessage = (message) => {
     const codec = client.codecFor(message.contentType);
     let content = message.content;
+
+    if (frameMetadata?.url && showFrame)
+      content = content.replace(frameMetadata?.url, "");
     if (!codec) {
       /*Not supported content type*/
       if (message?.contentFallback !== undefined)
@@ -143,6 +147,27 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     }
     return (
       <div style={styles.messageContent}>
+        {showFrame && frameMetadata?.frameInfo && (
+          <>
+            {isLoading && (
+              <div style={styles.renderedMessage}>{"Loading..."}</div>
+            )}
+            <Frame
+              image={frameMetadata?.frameInfo?.image.content}
+              title={getFrameTitle(frameMetadata)}
+              buttons={getOrderedButtons(frameMetadata)}
+              handleClick={handleFrameButtonClick}
+              frameButtonUpdating={frameButtonUpdating}
+              showAlert={showAlert}
+              alertMessage={alertMessage}
+              onClose={() => setShowAlert(false)}
+              interactionsEnabled={isXmtpFrameInitial}
+              textInput={frameMetadata?.frameInfo?.textInput?.content}
+              onTextInputChange={onTextInputChange}
+              frameUrl={frameMetadata?.url}
+            />
+          </>
+        )}
         <div style={styles.renderedMessage}>{content}</div>
         {renderFooter(message.sent)}
       </div>
@@ -156,28 +181,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     <li
       style={isSender ? styles.senderMessage : styles.receiverMessage}
       key={message.id}>
-      {!frameMetadata?.frameInfo && renderMessage(message)}
-      {showFrame && frameMetadata?.frameInfo && (
-        <div style={styles.messageContent}>
-          {isLoading && (
-            <div style={styles.renderedMessage}>{"Loading..."}</div>
-          )}
-          <Frame
-            image={frameMetadata?.frameInfo?.image.content}
-            title={getFrameTitle(frameMetadata)}
-            buttons={getOrderedButtons(frameMetadata)}
-            handleClick={handleFrameButtonClick}
-            frameButtonUpdating={frameButtonUpdating}
-            showAlert={showAlert}
-            alertMessage={alertMessage}
-            onClose={() => setShowAlert(false)}
-            interactionsEnabled={isXmtpFrameInitial}
-            textInput={frameMetadata?.frameInfo?.textInput?.content}
-            onTextInputChange={onTextInputChange}
-            frameUrl={frameMetadata?.url} // Add this line to pass the frame URL
-          />
-        </div>
-      )}
+      {renderMessage(message)}
     </li>
   );
 };
