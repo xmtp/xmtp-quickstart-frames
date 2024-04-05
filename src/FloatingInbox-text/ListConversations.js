@@ -159,7 +159,6 @@ export const ListConversations = ({
   useEffect(() => {
     if (selectedConversation) {
       navigate(`/dm/${selectedConversation}`, {});
-      //dms for refresh
     }
   }, [selectedConversation, navigate]);
 

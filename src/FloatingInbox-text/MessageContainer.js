@@ -66,8 +66,10 @@ export const MessageContainer = ({
     },
     popupButton: {
       borderRadius: "12px", // Rounded corners
+      padding: "5px", // Some padding
       paddingLeft: "10px", // Some padding on the left
       paddingRight: "10px", // Some padding on the right
+      border: "none", // No border
     },
     acceptButton: {
       backgroundColor: "blue", // Blue background
