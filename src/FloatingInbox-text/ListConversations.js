@@ -10,6 +10,7 @@ export const ListConversations = ({
   onConversationFound,
   isPWA = false,
   isFullScreen = false,
+  isConsent = false,
 }) => {
   // Inside your ListConversations component
   const location = useLocation();
@@ -194,24 +195,26 @@ export const ListConversations = ({
       );
       console.log("filtered", filtered.length);
 
-      const allowedConversations = filtered.filter(
-        (conversation) => conversation.consentState === "allowed",
-      );
+      if (isConsent) {
+        const allowedConversations = filtered.filter(
+          (conversation) => conversation.consentState === "allowed",
+        );
 
-      console.log("allowed", allowedConversations.length);
-      const requestConversations = filtered.filter(
-        (conversation) => conversation.consentState !== "allowed",
-      );
+        console.log("allowed", allowedConversations.length);
+        const requestConversations = filtered.filter(
+          (conversation) => conversation.consentState !== "allowed",
+        );
 
-      setAllowedConversations(allowedConversations);
-      setRequestConversations(requestConversations);
+        setAllowedConversations(allowedConversations);
+        setRequestConversations(requestConversations);
 
-      console.log(
-        "allowed",
-        allowedConversations.length,
-        "requests",
-        requestConversations.length,
-      );
+        console.log(
+          "allowed",
+          allowedConversations.length,
+          "requests",
+          requestConversations.length,
+        );
+      }
     };
 
     refreshAndFilterConversations();
@@ -231,7 +234,7 @@ export const ListConversations = ({
         onClick={() => {
           hightlightConversation(conversation);
         }}>
-        {/*<img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />*/}
+        <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />
         <div style={styles.conversationDetails}>
           {selectConversation.peerAddress}
           <span style={styles.conversationName}>

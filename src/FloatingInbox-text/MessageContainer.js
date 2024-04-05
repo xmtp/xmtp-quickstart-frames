@@ -14,9 +14,12 @@ export const MessageContainer = ({
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
-  const [showPopup, setShowPopup] = useState(
-    conversation?.consentState === "unknown",
-  );
+  const [showPopup, setShowPopup] = useState();
+
+  useEffect(() => {
+    setShowPopup(conversation?.consentState !== "allowed");
+    console.log("consentState", conversation?.consentState);
+  }, [conversation]);
 
   const styles = {
     loadingText: {
@@ -75,12 +78,13 @@ export const MessageContainer = ({
       backgroundColor: "blue", // Blue background
       color: "white", // White text
     },
-    blockButton: {
+    denyButton: {
       backgroundColor: "red", // Red background
       color: "white", // White text
     },
     popupTitle: {
       textAlign: "center",
+      marginTop: "0px",
     },
   };
 
@@ -131,15 +135,15 @@ export const MessageContainer = ({
     // Log the acceptance
   };
 
-  // Function to handle the blocking of a contact
-  const handleBlock = async () => {
-    // Block the contact
+  // Function to handle the denying of a contact
+  const handleDeny = async () => {
+    // Deny the contact
     await client.contacts.deny([conversation.peerAddress]);
     // Hide the popup
     setShowPopup(false);
     // Refresh the consent list
     await client.contacts.refreshConsentList();
-    // Log the blocking
+    // Log the denied
   };
   const startMessageStream = async () => {
     try {
@@ -242,18 +246,25 @@ export const MessageContainer = ({
           </ul>
           {isConsent && showPopup ? (
             <div style={styles.popup}>
-              <h4 style={styles.popupTitle}>Do you trust this contact?</h4>
+              <h4 style={styles.popupTitle}>
+                State is <small>{conversation.consentState}</small>. Do you
+                trust this contact?
+              </h4>
               <div style={styles.popupInner}>
-                <button
-                  style={{ ...styles.popupButton, ...styles.acceptButton }}
-                  onClick={handleAccept}>
-                  Accept
-                </button>
-                <button
-                  style={{ ...styles.popupButton, ...styles.blockButton }}
-                  onClick={handleBlock}>
-                  Block
-                </button>
+                {conversation.consentState !== "allowed" && (
+                  <button
+                    style={{ ...styles.popupButton, ...styles.acceptButton }}
+                    onClick={handleAccept}>
+                    Allow
+                  </button>
+                )}
+                {conversation.consentState !== "denied" && (
+                  <button
+                    style={{ ...styles.popupButton, ...styles.denyButton }}
+                    onClick={handleDeny}>
+                    Deny
+                  </button>
+                )}
               </div>
             </div>
           ) : null}

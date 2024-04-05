@@ -254,6 +254,7 @@ export const ConversationContainer = ({
             client={client}
             isFullScreen={isFullScreen}
             searchTerm={searchTerm}
+            isConsent={isConsent}
             selectConversation={setSelectedConversation}
             onConversationFound={(state) => {
               setConversationFound(state);
