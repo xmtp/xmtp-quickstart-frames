@@ -91,6 +91,8 @@ export const ListConversations = ({
     let stream;
     const fetchAndStreamConversations = async () => {
       setLoading(true);
+
+      await client.contacts.refreshConsentList();
       const allConversations = await client.conversations.list();
       // Assuming you have a method to fetch the last message for a conversation
 
@@ -181,29 +183,39 @@ export const ListConversations = ({
     }
   }, [conversations, location.pathname, selectConversation]);
 
-  const filteredConversations = conversations.filter(
-    (conversation) =>
-      conversation?.peerAddress
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) &&
-      conversation?.peerAddress !== client.address,
-  );
-
-  const allowed = filteredConversations.filter(
-    (conversation) => conversation.consentState === "allowed",
-  );
-  console.log("allowed", allowed.length);
-  const requests = filteredConversations.filter(
-    (conversation) =>
-      conversation.consentState === "unknown" ||
-      conversation.consentState === "denied",
-  );
-
   useEffect(() => {
-    if (filteredConversations.length > 0) {
-      onConversationFound(true);
-    }
-  }, [filteredConversations, onConversationFound]);
+    const refreshAndFilterConversations = async () => {
+      const filtered = conversations.filter(
+        (conversation) =>
+          conversation?.peerAddress
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) &&
+          conversation?.peerAddress !== client.address,
+      );
+      console.log("filtered", filtered.length);
+
+      const allowedConversations = filtered.filter(
+        (conversation) => conversation.consentState === "allowed",
+      );
+
+      console.log("allowed", allowedConversations.length);
+      const requestConversations = filtered.filter(
+        (conversation) => conversation.consentState !== "allowed",
+      );
+
+      setAllowedConversations(allowedConversations);
+      setRequestConversations(requestConversations);
+
+      console.log(
+        "allowed",
+        allowedConversations.length,
+        "requests",
+        requestConversations.length,
+      );
+    };
+
+    refreshAndFilterConversations();
+  }, [conversations, searchTerm, client.address]); // Add other dependencies as needed
 
   const renderConversations = (conversations) => {
     return conversations.map((conversation, index) => (
@@ -269,8 +281,8 @@ export const ListConversations = ({
             </button>
           )}
           {activeTab === "allowed"
-            ? renderConversations(allowed)
-            : renderConversations(requests)}
+            ? renderConversations(allowedConversations)
+            : renderConversations(requestConversations)}
         </>
       )}
     </>
