@@ -118,27 +118,6 @@ export const ListConversations = ({
 
     fetchAndStreamConversations();
 
-    // New filtering logic
-    const filteredConversations = conversations.filter(
-      (conversation) =>
-        conversation?.peerAddress
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) &&
-        conversation?.peerAddress !== client.address,
-    );
-
-    const allowed = filteredConversations.filter(
-      (conversation) => conversation.consentState === "allowed",
-    );
-    const requests = filteredConversations.filter(
-      (conversation) =>
-        conversation.consentState === "unknown" ||
-        conversation.consentState === "denied",
-    );
-
-    setAllowedConversations(allowed);
-    setRequestConversations(requests);
-
     return () => {
       isMounted = false;
       if (stream) {
@@ -211,6 +190,16 @@ export const ListConversations = ({
       conversation?.peerAddress !== client.address,
   );
 
+  const allowed = filteredConversations.filter(
+    (conversation) => conversation.consentState === "allowed",
+  );
+  console.log("allowed", allowed.length);
+  const requests = filteredConversations.filter(
+    (conversation) =>
+      conversation.consentState === "unknown" ||
+      conversation.consentState === "denied",
+  );
+
   useEffect(() => {
     if (filteredConversations.length > 0) {
       onConversationFound(true);
@@ -218,7 +207,7 @@ export const ListConversations = ({
   }, [filteredConversations, onConversationFound]);
 
   const renderConversations = (conversations) => {
-    conversations.map((conversation, index) => (
+    return conversations.map((conversation, index) => (
       <li
         key={index}
         style={{
@@ -258,7 +247,32 @@ export const ListConversations = ({
       {loading ? (
         <div>Loading conversations...</div>
       ) : (
-        <>{renderConversations(filteredConversations)}</>
+        <>
+          {activeTab === "requests" ? (
+            <button
+              style={{
+                ...styles.conversationListItem,
+                width: "100%",
+                padding: "5px",
+              }}
+              onClick={() => setActiveTab("allowed")}>
+              <div style={styles.conversationDetails}>← Allowed</div>
+            </button>
+          ) : (
+            <button
+              style={{
+                ...styles.conversationListItem,
+                width: "100%",
+                padding: "5px",
+              }}
+              onClick={() => setActiveTab("requests")}>
+              <div style={styles.conversationDetails}>Requests →</div>
+            </button>
+          )}
+          {activeTab === "allowed"
+            ? renderConversations(allowed)
+            : renderConversations(requests)}
+        </>
       )}
     </>
   );
