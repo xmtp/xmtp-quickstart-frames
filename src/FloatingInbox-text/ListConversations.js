@@ -28,6 +28,9 @@ export const ListConversations = ({
     setSelectedConversation(conversation.peerAddress);
     if (conversation.peerAddress) {
       navigate(`/dm/${conversation.peerAddress}`, {});
+      if (isConsent && conversation.consentState !== "allowed") {
+        setActiveTab("requests");
+      }
     }
   };
   const styles = {
@@ -139,14 +142,19 @@ export const ListConversations = ({
             "Notice: This app is not optimized for performance with a high number of conversations. For a better experience, try with wallets that have fewer conversations.",
           );
         }
+        await client.contacts.refreshConsentList();
+
         for (const conversation of conversations) {
           const conversationMessages = await conversation.messages();
-          const content =
-            conversationMessages[conversationMessages.length - 1]?.content;
+          const lastMessage =
+            conversationMessages[conversationMessages.length - 1];
+          const content = lastMessage?.content;
 
-          messages.push(
-            conversationMessages[conversationMessages.length - 1]?.content,
-          );
+          // Store objects with conversation ID and last message content
+          messages.push({
+            topic: conversation.topic, // Assuming each conversation has a unique 'id' field
+            content: content,
+          });
         }
         setLastMessages(messages);
       } catch (error) {
@@ -193,8 +201,6 @@ export const ListConversations = ({
             .includes(searchTerm.toLowerCase()) &&
           conversation?.peerAddress !== client.address,
       );
-      console.log("filtered", filtered.length);
-
       if (isConsent) {
         const allowedConversations = filtered.filter(
           (conversation) => conversation.consentState === "allowed",
@@ -202,7 +208,7 @@ export const ListConversations = ({
 
         console.log("allowed", allowedConversations.length);
         const requestConversations = filtered.filter(
-          (conversation) => conversation.consentState !== "allowed",
+          (conversation) => conversation.consentState === "unknown",
         );
 
         setAllowedConversations(allowedConversations);
@@ -220,41 +226,46 @@ export const ListConversations = ({
     refreshAndFilterConversations();
   }, [conversations, searchTerm, client.address]); // Add other dependencies as needed
 
+  // When rendering conversations, match the last message by conversation ID
   const renderConversations = (conversations) => {
-    return conversations.map((conversation, index) => (
-      <li
-        key={index}
-        style={{
-          ...styles.conversationListItem,
-          backgroundColor:
-            selectedConversation === conversation.peerAddress
-              ? "#d0e0f0"
-              : styles.conversationListItem.backgroundColor,
-        }}
-        onClick={() => {
-          hightlightConversation(conversation);
-        }}>
-        <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />
-        <div style={styles.conversationDetails}>
-          {selectConversation.peerAddress}
-          <span style={styles.conversationName}>
-            {conversation.peerAddress.substring(0, 7) +
-              "..." +
-              conversation.peerAddress.substring(
-                conversation.peerAddress.length - 5,
-              )}
-          </span>
-          <span style={styles.messagePreview}>
-            {lastMessages[index] ? lastMessages[index] : "..."}
-          </span>
-        </div>
-        <div style={styles.conversationTimestamp}>
-          {getRelativeTimeLabel(conversation.createdAt)}
-        </div>
-      </li>
-    ));
-  };
+    return conversations.map((conversation, index) => {
+      // Find the last message for this conversation by ID
+      const lastMessage =
+        lastMessages.find((msg) => msg.topic === conversation.topic)?.content ||
+        "...";
 
+      return (
+        <li
+          key={index}
+          style={{
+            ...styles.conversationListItem,
+            backgroundColor:
+              selectedConversation === conversation.peerAddress
+                ? "#d0e0f0"
+                : styles.conversationListItem.backgroundColor,
+          }}
+          onClick={() => {
+            hightlightConversation(conversation);
+          }}>
+          <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />
+          <div style={styles.conversationDetails}>
+            {selectConversation.peerAddress}
+            <span style={styles.conversationName}>
+              {conversation.peerAddress.substring(0, 7) +
+                "..." +
+                conversation.peerAddress.substring(
+                  conversation.peerAddress.length - 5,
+                )}
+            </span>
+            <span style={styles.messagePreview}>{lastMessage}</span>
+          </div>
+          <div style={styles.conversationTimestamp}>
+            {getRelativeTimeLabel(conversation.createdAt)}
+          </div>
+        </li>
+      );
+    });
+  };
   // UI for switching between tabs and displaying conversations
   return (
     <>
