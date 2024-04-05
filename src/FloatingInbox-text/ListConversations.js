@@ -228,6 +228,13 @@ export const ListConversations = ({
 
   // When rendering conversations, match the last message by conversation ID
   const renderConversations = (conversations) => {
+    if (conversations.length === 0) {
+      return (
+        <small style={styles.conversationListItem}>
+          No conversations found
+        </small>
+      );
+    }
     return conversations.map((conversation, index) => {
       // Find the last message for this conversation by ID
       const lastMessage =
@@ -270,7 +277,9 @@ export const ListConversations = ({
   return (
     <>
       {loading ? (
-        <div>Loading conversations...</div>
+        <small style={styles.conversationListItem}>
+          Loading conversations...
+        </small>
       ) : (
         <>
           {activeTab === "requests" ? (
@@ -291,7 +300,9 @@ export const ListConversations = ({
                 padding: "5px",
               }}
               onClick={() => setActiveTab("requests")}>
-              <div style={styles.conversationDetails}>Requests →</div>
+              <div style={styles.conversationDetails}>
+                Requests ({requestConversations.length}) →
+              </div>
             </button>
           )}
           {activeTab === "allowed"
