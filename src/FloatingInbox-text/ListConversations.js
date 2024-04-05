@@ -18,6 +18,10 @@ export const ListConversations = ({
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
 
+  const [allowedConversations, setAllowedConversations] = useState([]);
+  const [requestConversations, setRequestConversations] = useState([]);
+  const [activeTab, setActiveTab] = useState("allowed"); // Added state for active tab
+
   const hightlightConversation = (conversation) => {
     selectConversation(conversation);
     setSelectedConversation(conversation.peerAddress);
@@ -38,6 +42,11 @@ export const ListConversations = ({
 
       transition: "background-color 0.3s ease",
       padding: isPWA === true ? "15px" : "10px",
+    },
+    conversationListItemTab: {
+      width: "100%",
+      fontSize: "12px",
+      padding: "5px",
     },
     avatarImage: {
       // New style for the avatar image
@@ -108,6 +117,27 @@ export const ListConversations = ({
     };
 
     fetchAndStreamConversations();
+
+    // New filtering logic
+    const filteredConversations = conversations.filter(
+      (conversation) =>
+        conversation?.peerAddress
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) &&
+        conversation?.peerAddress !== client.address,
+    );
+
+    const allowed = filteredConversations.filter(
+      (conversation) => conversation.consentState === "allowed",
+    );
+    const requests = filteredConversations.filter(
+      (conversation) =>
+        conversation.consentState === "unknown" ||
+        conversation.consentState === "denied",
+    );
+
+    setAllowedConversations(allowed);
+    setRequestConversations(requests);
 
     return () => {
       isMounted = false;
@@ -187,49 +217,48 @@ export const ListConversations = ({
     }
   }, [filteredConversations, onConversationFound]);
 
+  const renderConversations = (conversations) => {
+    conversations.map((conversation, index) => (
+      <li
+        key={index}
+        style={{
+          ...styles.conversationListItem,
+          backgroundColor:
+            selectedConversation === conversation.peerAddress
+              ? "#d0e0f0"
+              : styles.conversationListItem.backgroundColor,
+        }}
+        onClick={() => {
+          hightlightConversation(conversation);
+        }}>
+        {/*<img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />*/}
+        <div style={styles.conversationDetails}>
+          {selectConversation.peerAddress}
+          <span style={styles.conversationName}>
+            {conversation.peerAddress.substring(0, 7) +
+              "..." +
+              conversation.peerAddress.substring(
+                conversation.peerAddress.length - 5,
+              )}
+          </span>
+          <span style={styles.messagePreview}>
+            {lastMessages[index] ? lastMessages[index] : "..."}
+          </span>
+        </div>
+        <div style={styles.conversationTimestamp}>
+          {getRelativeTimeLabel(conversation.createdAt)}
+        </div>
+      </li>
+    ));
+  };
+
+  // UI for switching between tabs and displaying conversations
   return (
     <>
       {loading ? (
-        <div style={{ padding: "20px", fontSize: "12px", textAlign: "center" }}>
-          Loading conversations...
-        </div>
-      ) : selectedConversation === null && conversations.length === 0 ? (
-        <div style={{ padding: "20px", fontSize: "12px", textAlign: "center" }}>
-          No conversations found. Use the input above to start a new one.
-        </div>
+        <div>Loading conversations...</div>
       ) : (
-        filteredConversations.map((conversation, index) => (
-          <li
-            key={index}
-            style={{
-              ...styles.conversationListItem,
-              backgroundColor:
-                selectedConversation === conversation.peerAddress
-                  ? "#d0e0f0"
-                  : styles.conversationListItem.backgroundColor,
-            }}
-            onClick={() => {
-              hightlightConversation(conversation);
-            }}>
-            {/*<img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />*/}
-            <div style={styles.conversationDetails}>
-              {selectConversation.peerAddress}
-              <span style={styles.conversationName}>
-                {conversation.peerAddress.substring(0, 7) +
-                  "..." +
-                  conversation.peerAddress.substring(
-                    conversation.peerAddress.length - 5,
-                  )}
-              </span>
-              <span style={styles.messagePreview}>
-                {lastMessages[index] ? lastMessages[index] : "..."}
-              </span>
-            </div>
-            <div style={styles.conversationTimestamp}>
-              {getRelativeTimeLabel(conversation.createdAt)}
-            </div>
-          </li>
-        ))
+        <>{renderConversations(filteredConversations)}</>
       )}
     </>
   );

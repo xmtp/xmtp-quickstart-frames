@@ -246,7 +246,7 @@ export const ConversationContainer = ({
                     setLoadingNewConv(false); // Reset loading state regardless of outcome
                   }
                 }}>
-                Or create random conversation
+                or create random conversation
               </button>
             ))}
           <ListConversations
