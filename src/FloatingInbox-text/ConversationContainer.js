@@ -164,6 +164,7 @@ export const ConversationContainer = ({
       setSearchTerm(resolvedAddress);
       updateSearchTerm(resolvedAddress);
     } else {
+      //
       setMessage("Invalid Ethereum address");
       setPeerAddress(null);
       setCreateNew(false);
