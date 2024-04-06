@@ -27,6 +27,7 @@ export const ListConversations = ({
     selectConversation(conversation);
     setSelectedConversation(conversation.peerAddress);
     if (conversation.peerAddress) {
+      console.log("Navigating to conversation:", conversation.consentState);
       navigate(`/dm/${conversation.peerAddress}`, {});
       if (isConsent && conversation.consentState !== "allowed") {
         setActiveTab("requests");
@@ -95,8 +96,11 @@ export const ListConversations = ({
     let stream;
     const fetchAndStreamConversations = async () => {
       setLoading(true);
-
-      await client.contacts.refreshConsentList();
+      if (isConsent) {
+        //Refresh consent
+        console.log("Refreshing consent list");
+        await client.contacts.refreshConsentList();
+      }
       const allConversations = await client.conversations.list();
       // Assuming you have a method to fetch the last message for a conversation
 
@@ -147,7 +151,6 @@ export const ListConversations = ({
             "Notice: This app is not optimized for performance with a high number of conversations. For a better experience, try with wallets that have fewer conversations.",
           );
         }
-        await client.contacts.refreshConsentList();
 
         for (const conversation of conversations) {
           const conversationMessages = await conversation.messages();

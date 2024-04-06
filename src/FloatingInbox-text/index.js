@@ -308,10 +308,6 @@ export function FloatingInbox({
       });
       setClient(xmtp);
       setIsOnNetwork(!!xmtp.address);
-      if (isConsent) {
-        //Refresh consent
-        await xmtp.contacts.refreshConsentList();
-      }
     } catch (e) {
       console.log(e);
     }
