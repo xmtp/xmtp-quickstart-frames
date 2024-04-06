@@ -282,34 +282,38 @@ export function FloatingInbox({
   }, [wallet, signer, isOnNetwork, isConnected]);
 
   const initXmtpWithKeys = async function () {
-    if (!signer) {
-      handleLogout();
-      return;
-    }
-    let address = await getAddress(signer);
-    let keys = loadKeys(address);
+    try {
+      if (!signer) {
+        handleLogout();
+        return;
+      }
+      let address = await getAddress(signer);
+      let keys = loadKeys(address);
 
-    const clientOptions = {
-      env: env ? env : getEnv(),
-    };
+      const clientOptions = {
+        env: env ? env : getEnv(),
+      };
 
-    if (!keys) {
-      keys = await Client.getKeys(signer, {
+      if (!keys) {
+        keys = await Client.getKeys(signer, {
+          ...clientOptions,
+          skipContactPublishing: true,
+          persistConversations: false,
+        });
+        storeKeys(address, keys);
+      }
+      const xmtp = await Client.create(null, {
         ...clientOptions,
-        skipContactPublishing: true,
-        persistConversations: false,
+        privateKeyOverride: keys,
       });
-      storeKeys(address, keys);
-    }
-    const xmtp = await Client.create(null, {
-      ...clientOptions,
-      privateKeyOverride: keys,
-    });
-    setClient(xmtp);
-    setIsOnNetwork(!!xmtp.address);
-    if (isConsent) {
-      //Refresh consent
-      await xmtp.contacts.refreshConsentList();
+      setClient(xmtp);
+      setIsOnNetwork(!!xmtp.address);
+      if (isConsent) {
+        //Refresh consent
+        await xmtp.contacts.refreshConsentList();
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
   return (

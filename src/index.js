@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Router>
-      <InboxPage isPWA={true} isFullScreen={true} isConsent={false} />
+      <InboxPage isPWA={true} isFullScreen={true} isConsent={true} />
     </Router>
   </React.StrictMode>,
 );

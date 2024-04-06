@@ -10,6 +10,7 @@ export const ListConversations = ({
   onConversationFound,
   isPWA = false,
   isFullScreen = false,
+  isConsent = false,
 }) => {
   // Inside your ListConversations component
   const location = useLocation();
@@ -18,11 +19,18 @@ export const ListConversations = ({
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
 
+  const [allowedConversations, setAllowedConversations] = useState([]);
+  const [requestConversations, setRequestConversations] = useState([]);
+  const [activeTab, setActiveTab] = useState("allowed"); // Added state for active tab
+
   const hightlightConversation = (conversation) => {
     selectConversation(conversation);
     setSelectedConversation(conversation.peerAddress);
     if (conversation.peerAddress) {
       navigate(`/dm/${conversation.peerAddress}`, {});
+      if (isConsent && conversation.consentState !== "allowed") {
+        setActiveTab("requests");
+      }
     }
   };
   const styles = {
@@ -38,6 +46,11 @@ export const ListConversations = ({
 
       transition: "background-color 0.3s ease",
       padding: isPWA === true ? "15px" : "10px",
+    },
+    conversationListItemTab: {
+      width: "100%",
+      fontSize: "12px",
+      padding: "5px",
     },
     avatarImage: {
       // New style for the avatar image
@@ -82,6 +95,8 @@ export const ListConversations = ({
     let stream;
     const fetchAndStreamConversations = async () => {
       setLoading(true);
+
+      await client.contacts.refreshConsentList();
       const allConversations = await client.conversations.list();
       // Assuming you have a method to fetch the last message for a conversation
 
@@ -92,8 +107,13 @@ export const ListConversations = ({
         setConversations(sortedConversations);
       }
       setLoading(false);
+
       stream = await client.conversations.stream();
       for await (const conversation of stream) {
+        console.log("New conversation:", conversation.consentState);
+        //Need to fix this manually
+        if (conversation.client?.address === client.address)
+          await client.contacts.allow([conversation.peerAddress]);
         if (isMounted) {
           setConversations((prevConversations) => {
             const newConversations = [...prevConversations, conversation];
@@ -127,14 +147,19 @@ export const ListConversations = ({
             "Notice: This app is not optimized for performance with a high number of conversations. For a better experience, try with wallets that have fewer conversations.",
           );
         }
+        await client.contacts.refreshConsentList();
+
         for (const conversation of conversations) {
           const conversationMessages = await conversation.messages();
-          const content =
-            conversationMessages[conversationMessages.length - 1]?.content;
+          const lastMessage =
+            conversationMessages[conversationMessages.length - 1];
+          const content = lastMessage?.content;
 
-          messages.push(
-            conversationMessages[conversationMessages.length - 1]?.content,
-          );
+          // Store objects with conversation ID and last message content
+          messages.push({
+            topic: conversation.topic, // Assuming each conversation has a unique 'id' field
+            content: content,
+          });
         }
         setLastMessages(messages);
       } catch (error) {
@@ -150,7 +175,6 @@ export const ListConversations = ({
   useEffect(() => {
     if (selectedConversation) {
       navigate(`/dm/${selectedConversation}`, {});
-      //dms for refresh
     }
   }, [selectedConversation, navigate]);
 
@@ -173,63 +197,123 @@ export const ListConversations = ({
     }
   }, [conversations, location.pathname, selectConversation]);
 
-  const filteredConversations = conversations.filter(
-    (conversation) =>
-      conversation?.peerAddress
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) &&
-      conversation?.peerAddress !== client.address,
-  );
-
   useEffect(() => {
-    if (filteredConversations.length > 0) {
-      onConversationFound(true);
-    }
-  }, [filteredConversations, onConversationFound]);
+    const refreshAndFilterConversations = async () => {
+      const filtered = conversations.filter(
+        (conversation) =>
+          conversation?.peerAddress
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) &&
+          conversation?.peerAddress !== client.address,
+      );
 
+      if (isConsent) {
+        const allowedConversations = filtered.filter(
+          (conversation) => conversation.consentState === "allowed",
+        );
+
+        const requestConversations = filtered.filter(
+          (conversation) => conversation.consentState === "unknown",
+        );
+
+        setAllowedConversations(allowedConversations);
+        setRequestConversations(requestConversations);
+
+        console.log(
+          "allowed",
+          allowedConversations.length,
+          "requests",
+          requestConversations.length,
+        );
+      }
+    };
+
+    refreshAndFilterConversations();
+  }, [conversations, searchTerm, client.address]); // Add other dependencies as needed
+
+  // When rendering conversations, match the last message by conversation ID
+  const renderConversations = (conversations) => {
+    if (conversations.length === 0) {
+      return (
+        <small style={styles.conversationListItem}>
+          No conversations found
+        </small>
+      );
+    }
+    return conversations.map((conversation, index) => {
+      // Find the last message for this conversation by ID
+      const lastMessage =
+        lastMessages.find((msg) => msg.topic === conversation.topic)?.content ||
+        "...";
+
+      return (
+        <li
+          key={index}
+          style={{
+            ...styles.conversationListItem,
+            backgroundColor:
+              selectedConversation === conversation.peerAddress
+                ? "#d0e0f0"
+                : styles.conversationListItem.backgroundColor,
+          }}
+          onClick={() => {
+            hightlightConversation(conversation);
+          }}>
+          <img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />
+          <div style={styles.conversationDetails}>
+            {selectConversation.peerAddress}
+            <span style={styles.conversationName}>
+              {conversation.peerAddress.substring(0, 7) +
+                "..." +
+                conversation.peerAddress.substring(
+                  conversation.peerAddress.length - 5,
+                )}
+            </span>
+            <span style={styles.messagePreview}>{lastMessage}</span>
+          </div>
+          <div style={styles.conversationTimestamp}>
+            {getRelativeTimeLabel(conversation.createdAt)}
+          </div>
+        </li>
+      );
+    });
+  };
+  // UI for switching between tabs and displaying conversations
   return (
     <>
       {loading ? (
-        <div style={{ padding: "20px", fontSize: "12px", textAlign: "center" }}>
+        <small style={styles.conversationListItem}>
           Loading conversations...
-        </div>
-      ) : selectedConversation === null && conversations.length === 0 ? (
-        <div style={{ padding: "20px", fontSize: "12px", textAlign: "center" }}>
-          No conversations found. Use the input above to start a new one.
-        </div>
+        </small>
       ) : (
-        filteredConversations.map((conversation, index) => (
-          <li
-            key={index}
-            style={{
-              ...styles.conversationListItem,
-              backgroundColor:
-                selectedConversation === conversation.peerAddress
-                  ? "#d0e0f0"
-                  : styles.conversationListItem.backgroundColor,
-            }}
-            onClick={() => {
-              hightlightConversation(conversation);
-            }}>
-            {/*<img src="/avatar.png" alt="Avatar" style={styles.avatarImage} />*/}
-            <div style={styles.conversationDetails}>
-              {selectConversation.peerAddress}
-              <span style={styles.conversationName}>
-                {conversation.peerAddress.substring(0, 7) +
-                  "..." +
-                  conversation.peerAddress.substring(
-                    conversation.peerAddress.length - 5,
-                  )}
-              </span>
-              <span style={styles.messagePreview}>
-                {lastMessages[index] ? lastMessages[index] : "..."}
-              </span>
-            </div>
-            <div style={styles.conversationTimestamp}>
-              {getRelativeTimeLabel(conversation.createdAt)}
-            </div>
-          </li>
-        ))
+        <>
+          {activeTab === "requests" ? (
+            <button
+              style={{
+                ...styles.conversationListItem,
+                width: "100%",
+                padding: "5px",
+              }}
+              onClick={() => setActiveTab("allowed")}>
+              <div style={styles.conversationDetails}>← Allowed</div>
+            </button>
+          ) : (
+            <button
+              style={{
+                ...styles.conversationListItem,
+                width: "100%",
+                padding: "5px",
+              }}
+              onClick={() => setActiveTab("requests")}>
+              <div style={styles.conversationDetails}>
+                Requests ({requestConversations.length}) →
+              </div>
+            </button>
+          )}
+          {activeTab === "allowed"
+            ? renderConversations(allowedConversations)
+            : renderConversations(requestConversations)}
+        </>
       )}
     </>
   );

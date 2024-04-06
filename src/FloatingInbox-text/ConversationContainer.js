@@ -24,7 +24,6 @@ export const ConversationContainer = ({
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingResolve, setLoadingResolve] = useState(false);
-  const [canMessage, setCanMessage] = useState(false);
   const [conversationFound, setConversationFound] = useState(false);
   const [createNew, setCreateNew] = useState(false);
 
@@ -38,7 +37,7 @@ export const ConversationContainer = ({
       margin: "0",
       listStyle: "none",
       overflowY: "scroll",
-      "-webkit-overflow-scrolling": "touch", // Let it scroll on iOS
+      WebkitOverflowScrolling: "touch", // Let it scroll on iOS
     },
     conversationListItem: {
       display: "flex",
@@ -134,10 +133,6 @@ export const ConversationContainer = ({
     },
   };
 
-  const selectConversation = async (conversation) => {
-    setSelectedConversation(conversation);
-  };
-
   const isValidEthereumAddress = (address) => {
     return /^0x[a-fA-F0-9]{40}$/.test(address);
   };
@@ -172,7 +167,6 @@ export const ConversationContainer = ({
       setMessage("Invalid Ethereum address");
       setPeerAddress(null);
       setCreateNew(false);
-      //setCanMessage(false);
     }
   };
 
@@ -181,16 +175,13 @@ export const ConversationContainer = ({
     if (address === client.address) {
       setMessage("No self messaging allowed");
       setCreateNew(false);
-      // setCanMessage(false);
     } else {
       const canMessageStatus = await client?.canMessage(address);
       if (canMessageStatus) {
         setPeerAddress(address);
-        // setCanMessage(true);
         setMessage("Address is on the network ✅");
         setCreateNew(true);
       } else {
-        //  setCanMessage(false);
         setMessage("Address is not on the network ❌");
         setCreateNew(false);
       }
@@ -246,7 +237,7 @@ export const ConversationContainer = ({
                     setLoadingNewConv(false); // Reset loading state regardless of outcome
                   }
                 }}>
-                Or create random conversation
+                or create random conversation
               </button>
             ))}
           <ListConversations
@@ -254,6 +245,7 @@ export const ConversationContainer = ({
             client={client}
             isFullScreen={isFullScreen}
             searchTerm={searchTerm}
+            isConsent={isConsent}
             selectConversation={setSelectedConversation}
             onConversationFound={(state) => {
               setConversationFound(state);
@@ -311,7 +303,7 @@ export const ConversationContainer = ({
               conversation={selectedConversation}
               searchTerm={searchTerm}
               isConsent={isConsent}
-              selectConversation={selectConversation}
+              selectConversation={setSelectedConversation}
             />
           )}
         </>
