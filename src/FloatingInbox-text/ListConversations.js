@@ -195,8 +195,15 @@ export const ListConversations = ({
         console.log("No conversation found with address:", address);
       }
     } else if (conversations.length > 0 && isFullScreen) {
-      // If no deep linking match, select the first conversation
-      hightlightConversation(conversations[0]);
+      // If no deep linking match, select the first conversation by default
+      let firstConv = conversations[0];
+      if (isConsent) {
+        const allowedConversations = conversations.filter(
+          (conversation) => conversation.consentState === "allowed",
+        );
+        firstConv = allowedConversations[0];
+      }
+      hightlightConversation(firstConv);
     }
   }, [conversations, location.pathname, selectConversation]);
 
