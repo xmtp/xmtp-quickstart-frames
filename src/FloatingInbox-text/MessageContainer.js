@@ -18,7 +18,6 @@ export const MessageContainer = ({
 
   useEffect(() => {
     setShowPopup(conversation?.consentState !== "allowed");
-    console.log("consentState", conversation?.consentState);
   }, [conversation]);
 
   const styles = {
@@ -191,10 +190,6 @@ export const MessageContainer = ({
     }
     if (conversation && conversation.peerAddress) {
       await conversation.send(newMessage);
-    } else if (conversation) {
-      const conv = await client.conversations.newConversation(searchTerm);
-      await conv.send(newMessage);
-      selectConversation(conv);
     }
   };
 

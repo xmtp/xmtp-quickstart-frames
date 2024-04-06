@@ -107,8 +107,13 @@ export const ListConversations = ({
         setConversations(sortedConversations);
       }
       setLoading(false);
+
       stream = await client.conversations.stream();
       for await (const conversation of stream) {
+        console.log("New conversation:", conversation.consentState);
+        //Need to fix this manually
+        if (conversation.client?.address === client.address)
+          await client.contacts.allow([conversation.peerAddress]);
         if (isMounted) {
           setConversations((prevConversations) => {
             const newConversations = [...prevConversations, conversation];
@@ -201,12 +206,12 @@ export const ListConversations = ({
             .includes(searchTerm.toLowerCase()) &&
           conversation?.peerAddress !== client.address,
       );
+
       if (isConsent) {
         const allowedConversations = filtered.filter(
           (conversation) => conversation.consentState === "allowed",
         );
 
-        console.log("allowed", allowedConversations.length);
         const requestConversations = filtered.filter(
           (conversation) => conversation.consentState === "unknown",
         );
