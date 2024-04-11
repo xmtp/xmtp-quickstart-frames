@@ -243,7 +243,7 @@ export const ListConversations = ({
 
   // When rendering conversations, match the last message by conversation ID
   const renderConversations = (conversations) => {
-    if (conversations.length === 0) {
+    if (!searchTerm && conversations.length === 0) {
       return (
         <small style={styles.conversationListItem}>
           No conversations found

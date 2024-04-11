@@ -253,7 +253,7 @@ export const ConversationContainer = ({
               if (state === true) setCreateNew(false);
             }}
           />
-          {message && conversationFound !== true && (
+          {message && createNew && conversationFound !== true && (
             <small style={styles.messageClass}>{message}</small>
           )}
           {peerAddress && createNew && !conversationFound && (
@@ -278,6 +278,7 @@ export const ConversationContainer = ({
                       // Optionally handle error (e.g., display error message)
                     } finally {
                       setLoadingNewConv(false); // Reset loading state regardless of outcome
+                      setCreateNew(false);
                     }
                   }}>
                   Create new conversation
