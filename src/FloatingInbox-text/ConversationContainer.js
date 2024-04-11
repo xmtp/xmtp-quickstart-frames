@@ -122,6 +122,7 @@ export const ConversationContainer = ({
     },
     messageClass: {
       textAlign: "center",
+      margin: "10px",
       display: "block",
     },
     peerAddressInput: {
@@ -164,7 +165,6 @@ export const ConversationContainer = ({
       setSearchTerm(resolvedAddress);
       updateSearchTerm(resolvedAddress);
     } else {
-      //
       setMessage("Invalid Ethereum address");
       setPeerAddress(null);
       setCreateNew(false);
@@ -250,10 +250,11 @@ export const ConversationContainer = ({
             selectConversation={setSelectedConversation}
             onConversationFound={(state) => {
               setConversationFound(state);
-              if (state === true) setCreateNew(false);
+              setCreateNew(!state);
+              console.log(conversationFound, createNew);
             }}
           />
-          {message && createNew && conversationFound !== true && (
+          {message && conversationFound !== true && (
             <small style={styles.messageClass}>{message}</small>
           )}
           {peerAddress && createNew && !conversationFound && (
@@ -278,7 +279,7 @@ export const ConversationContainer = ({
                       // Optionally handle error (e.g., display error message)
                     } finally {
                       setLoadingNewConv(false); // Reset loading state regardless of outcome
-                      setCreateNew(false);
+                      //setCreateNew(false);
                     }
                   }}>
                   Create new conversation

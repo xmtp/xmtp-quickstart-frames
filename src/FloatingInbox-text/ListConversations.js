@@ -216,7 +216,8 @@ export const ListConversations = ({
             .includes(searchTerm.toLowerCase()) &&
           conversation?.peerAddress !== client.address,
       );
-
+      if (filtered.length > 0) onConversationFound(true);
+      else onConversationFound(false);
       if (isConsent) {
         const allowedConversations = filtered.filter(
           (conversation) => conversation.consentState === "allowed",
