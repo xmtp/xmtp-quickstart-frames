@@ -86,6 +86,20 @@ export function FloatingInbox({
     widgetHeader: {
       padding: "2px",
     },
+    labelGithub: {
+      textDecoration: "none",
+      color: "black",
+      marginRight: "10px",
+    },
+    labelGithub2: {
+      color: "black",
+      fontSize: "10px",
+      marginBottom: "10px",
+      postition: "absolute", // Added position absolute
+      bottom: "50px",
+      marginTop: "20px",
+      textDecoration: "underline",
+    },
     labelRight: {
       textAlign: "right",
       fontSize: "10px",
@@ -130,6 +144,7 @@ export function FloatingInbox({
       flexDirection: "column",
       alignItems: "center",
       height: "100%",
+      position: "relative",
     },
     btnXmtp: {
       display: "block",
@@ -369,6 +384,13 @@ export function FloatingInbox({
                       navigator.clipboard.writeText(address);
                       alert("Address copied to clipboard");
                     }}>
+                    <a
+                      href="https://github.com/xmtp/xmtp-js"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={styles.labelGithub}>
+                      View on GitHub
+                    </a>
                     {"Your address: " +
                       address?.substring(0, 7) +
                       "..." +
@@ -388,6 +410,13 @@ export function FloatingInbox({
                 <div style={styles.label} onClick={createNewWallet}>
                   or create new one
                 </div>
+                <a
+                  href="https://github.com/xmtp/xmtp-js"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.labelGithub2}>
+                  View on GitHub
+                </a>
               </div>
             )}
             {isConnected && !isOnNetwork && (
