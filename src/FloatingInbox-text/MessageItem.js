@@ -77,12 +77,15 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       setFrameButtonUpdating(buttonIndex);
       const framesClient = new FramesClient(client);
       const postUrl = button.target || frameInfo.postUrl || frameUrl;
+      console.log(frameInfo.state);
       const payload = await framesClient.signFrameAction({
         frameUrl,
         inputText: textInputValue || undefined,
         buttonIndex,
         conversationTopic,
         participantAccountAddresses: [senderAddress, client.address],
+        address: client.address,
+        state: frameInfo.state,
       });
       if (action === "post") {
         const updatedFrameMetadata = await framesClient.proxy.post(
