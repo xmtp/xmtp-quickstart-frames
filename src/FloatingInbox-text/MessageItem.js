@@ -77,7 +77,6 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       setFrameButtonUpdating(buttonIndex);
       const framesClient = new FramesClient(client);
       const postUrl = button.target || frameInfo.postUrl || frameUrl;
-      console.log(frameInfo.state);
       const payload = await framesClient.signFrameAction({
         frameUrl,
         inputText: textInputValue || undefined,
