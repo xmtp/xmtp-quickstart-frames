@@ -6,6 +6,9 @@ import {
   getOrderedButtons,
   isXmtpFrame,
 } from "../Frames/FrameInfo";
+import { createWalletClient, custom, parseEther } from "viem";
+import { sepolia } from "viem/chains";
+
 import { FramesClient } from "@xmtp/frames-client";
 import { fetchFrameFromUrl } from "../Frames/utils"; // Ensure you have this helper or implement it
 
@@ -74,6 +77,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
         return;
       }
       const button = frameInfo.buttons[buttonIndex];
+      console.log(button);
       setFrameButtonUpdating(buttonIndex);
       const framesClient = new FramesClient(client);
       const postUrl = button.target || frameInfo.postUrl || frameUrl;
@@ -86,7 +90,43 @@ export const MessageItem = ({ message, senderAddress, client }) => {
         address: client.address,
         state: frameInfo.state,
       });
-      if (action === "post") {
+
+      if (action === "tx") {
+        const transactionInfo = await framesClient.proxy.postTransaction(
+          button.target,
+          {
+            ...payload,
+          },
+        );
+        console.log("Transaction info", transactionInfo);
+        const address = transactionInfo.params.to;
+
+        try {
+          const walletClient = createWalletClient({
+            chain: sepolia,
+            transport: custom(window.ethereum),
+          });
+
+          const hash = await walletClient.sendTransaction({
+            account: client.address,
+            to: address,
+            value: transactionInfo.params.value, // 1 as bigint
+          });
+
+          const buttonPostUrl =
+            frameMetadata.extractedTags["fc:frame:button:1:post_url"];
+          const completeTransactionMetadata = await framesClient.proxy.post(
+            buttonPostUrl,
+            {
+              ...payload,
+              transactionId: hash,
+            },
+          );
+          setFrameMetadata(completeTransactionMetadata);
+        } catch (e) {
+          console.log("Transaction error", e);
+        }
+      } else if (action === "post") {
         const updatedFrameMetadata = await framesClient.proxy.post(
           postUrl,
           payload,
