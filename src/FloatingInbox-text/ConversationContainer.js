@@ -4,6 +4,7 @@ import { Client } from "@xmtp/xmtp-js";
 import { ListConversations } from "./ListConversations";
 import { MessageContainer } from "./MessageContainer";
 import { useNavigate } from "react-router-dom";
+import GroupChatUI from "../Groups/GroupChatUI"; // Adjust the import path as necessary
 
 export const ConversationContainer = ({
   client,
@@ -26,6 +27,16 @@ export const ConversationContainer = ({
   const [loadingResolve, setLoadingResolve] = useState(false);
   const [conversationFound, setConversationFound] = useState(false);
   const [createNew, setCreateNew] = useState(false);
+
+  //Groups
+  //Group
+  const [showGroupChatUI, setShowGroupChatUI] = useState(false); // State to toggle Group Chat UI
+
+  // Existing styles and functions...
+
+  const toggleGroupChatUI = () => {
+    setShowGroupChatUI(!showGroupChatUI);
+  };
 
   const styles = {
     conversations: {
@@ -196,50 +207,55 @@ export const ConversationContainer = ({
   }
 
   const renderListConversations = () => {
+    if (showGroupChatUI) {
+      return <GroupChatUI />;
+    }
     return (
       <div style={styles.conversations}>
         <ul style={styles.conversationList}>
-          <input
-            type="text"
-            placeholder="Enter a 0x wallet or ENS address"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            style={styles.peerAddressInput}
-          />
-          {loadingResolve && searchTerm && <small>Resolving address...</small>}
           {!searchTerm &&
             (loadingNewConv ? ( // Check if loadingNewConv is true
               <button style={styles.createNewButtonR}>Loading...</button> // Display loading message or spinner
             ) : (
-              <button
-                style={{
-                  ...styles.createNewButtonR,
-                }}
-                onClick={async () => {
-                  setLoadingNewConv(true); // Set loading state to true
-                  try {
-                    const randomWallet = ethers.Wallet.createRandom();
-                    const randomClient = await Client.create(randomWallet, {
-                      env: env,
-                    });
-                    const newConversation =
-                      await client.conversations.newConversation(
-                        randomClient.address,
-                      );
-                    setSelectedConversation(newConversation);
-                    setSearchTerm("");
-                    if (newConversation?.peerAddress) {
-                      navigate(`/dm/${newConversation?.peerAddress}`, {});
+              <>
+                <button
+                  style={{
+                    ...styles.createNewButtonR,
+                  }}
+                  onClick={toggleGroupChatUI}>
+                  Create Group Chat
+                </button>
+
+                <button
+                  style={{
+                    ...styles.createNewButtonR,
+                  }}
+                  onClick={async () => {
+                    setLoadingNewConv(true); // Set loading state to true
+                    try {
+                      const randomWallet = ethers.Wallet.createRandom();
+                      const randomClient = await Client.create(randomWallet, {
+                        env: env,
+                      });
+                      const newConversation =
+                        await client.conversations.newConversation(
+                          randomClient.address,
+                        );
+                      setSelectedConversation(newConversation);
+                      setSearchTerm("");
+                      if (newConversation?.peerAddress) {
+                        navigate(`/dm/${newConversation?.peerAddress}`, {});
+                      }
+                    } catch (error) {
+                      console.error("Failed to create new conversation", error);
+                      // Optionally handle error (e.g., display error message)
+                    } finally {
+                      setLoadingNewConv(false); // Reset loading state regardless of outcome
                     }
-                  } catch (error) {
-                    console.error("Failed to create new conversation", error);
-                    // Optionally handle error (e.g., display error message)
-                  } finally {
-                    setLoadingNewConv(false); // Reset loading state regardless of outcome
-                  }
-                }}>
-                or create random conversation
-              </button>
+                  }}>
+                  or create random conversation
+                </button>
+              </>
             ))}
           <ListConversations
             isPWA={isPWA}
