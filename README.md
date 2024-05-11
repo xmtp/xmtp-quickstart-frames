@@ -25,9 +25,3 @@ Head to our docs to understand XMTP's concepts
 - [Messages](https://xmtp.org/docs/build/messages/?sdk=js)
 - [Streams](https://xmtp.org/docs/build/streams/?sdk=js)
 - [Frames](https://xmtp.org/docs/build/frames)
-
-#### Troubleshooting
-
-If you get into issues with `Buffer` and `polyfills` check out the fix below:
-
-- [Check out Buffer issue](https://github.com/xmtp/xmtp-js/issues/487)

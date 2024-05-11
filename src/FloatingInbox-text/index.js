@@ -385,7 +385,7 @@ export function FloatingInbox({
                       alert("Address copied to clipboard");
                     }}>
                     <a
-                      href="https://github.com/xmtp/xmtp-js"
+                      href="https://github.com/xmtp/dev-inbox"
                       target="_blank"
                       rel="noopener noreferrer"
                       style={styles.labelGithub}>
@@ -411,7 +411,7 @@ export function FloatingInbox({
                   or create new one
                 </div>
                 <a
-                  href="https://github.com/xmtp/xmtp-js"
+                  href="https://github.com/xmtp/dev-inbox"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={styles.labelGithub2}>
