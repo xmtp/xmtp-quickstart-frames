@@ -195,6 +195,10 @@ export const ConversationContainer = ({
     );
   }
 
+  const handleDeepLinkClick = (conversation) => {
+    console.log("handleDeepLinkClick pepe", conversation);
+    setSelectedConversation(conversation);
+  };
   const renderListConversations = () => {
     return (
       <div style={styles.conversations}>
@@ -251,7 +255,6 @@ export const ConversationContainer = ({
             onConversationFound={(state) => {
               setConversationFound(state);
               setCreateNew(!state);
-              console.log(conversationFound, createNew);
             }}
           />
           {message && conversationFound !== true && (
@@ -307,6 +310,7 @@ export const ConversationContainer = ({
               searchTerm={searchTerm}
               isConsent={isConsent}
               selectConversation={setSelectedConversation}
+              setSelectedConversation2={handleDeepLinkClick}
             />
           )}
         </>

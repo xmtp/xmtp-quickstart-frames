@@ -6,17 +6,32 @@ import {
   getOrderedButtons,
   isXmtpFrame,
 } from "../Frames/FrameInfo";
-import { createWalletClient, custom, parseEther } from "viem";
+import { ReactComponent as Degen } from "./DegenEmoji.svg"; // Import your custom SVG
+import { EmojiPicker } from "./EmojiPicker";
+import { createWalletClient, custom } from "viem";
 import { sepolia } from "viem/chains";
 
+import { useNavigate } from "react-router-dom";
 import { FramesClient } from "@xmtp/frames-client";
 import { fetchFrameFromUrl } from "../Frames/utils"; // Ensure you have this helper or implement it
 
-export const MessageItem = ({ message, senderAddress, client }) => {
+import { ContentTypeReaction } from "@xmtp/content-type-reaction";
+
+export const MessageItem = ({
+  message,
+  senderAddress,
+  client,
+  onReaction,
+  messageReactions,
+  conversation,
+  setSelectedConversation2,
+}) => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [frameMetadata, setFrameMetadata] = useState();
   const [frameButtonUpdating, setFrameButtonUpdating] = useState(0);
   const [textInputValue, setTextInputValue] = useState("");
+  const [reactions, setReactions] = useState(messageReactions || []);
 
   const styles = {
     messageContent: {
@@ -32,6 +47,11 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       maxWidth: "80%",
       wordBreak: "break-word",
       listStyle: "none",
+    },
+    deepLink: {
+      color: "white",
+      textDecoration: "underline",
+      fontSize: "12px",
     },
     renderedMessage: {
       fontSize: "12px",
@@ -62,6 +82,21 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     },
   };
 
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const handleEmojiPick = (emoji) => {
+    if (emoji) {
+      setReactions((prevReactions) => {
+        if (prevReactions.includes(emoji)) {
+          return prevReactions.filter((r) => r !== emoji);
+        }
+        return [...prevReactions, emoji];
+      });
+
+      onReaction(message, emoji);
+    }
+    setShowEmojiPicker(false);
+  };
+
   function onTextInputChange(event) {
     setTextInputValue(event.target.value);
   }
@@ -77,7 +112,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
         return;
       }
       const button = frameInfo.buttons[buttonIndex];
-      console.log(button);
+
       setFrameButtonUpdating(buttonIndex);
       const framesClient = new FramesClient(client);
       const postUrl = button.target || frameInfo.postUrl || frameUrl;
@@ -175,20 +210,69 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     );
   };
 
+  const handleSelect = (selected) => {
+    if (selected === "reply") {
+      //handleReplyPick(selected);
+    } else {
+      handleEmojiPick(selected);
+    }
+  };
   const renderMessage = (message) => {
     const codec = client.codecFor(message.contentType);
     let content = message.content;
-
     if (frameMetadata?.url && showFrame)
       content = content.replace(frameMetadata?.url, "");
-    if (!codec) {
+    if (message.contentType.sameAs(ContentTypeReaction)) {
+    } else if (!codec) {
       /*Not supported content type*/
       if (message?.contentFallback !== undefined)
         content = message?.contentFallback;
       else return;
     }
+    // Replace newline characters with <br /> tags
+    content = content.split("\n").join("<br />");
+
+    const deepLinkRegex = /dm:\/[0-9a-zA-Z]+(\?[a-zA-Z0-9=&]+)?/;
+    let deepLinkMatch = content.match(deepLinkRegex);
+    if (deepLinkMatch) {
+      deepLinkMatch = deepLinkMatch[0];
+      content = content.replace(deepLinkMatch, "");
+      deepLinkMatch = deepLinkMatch.replace("dm:", "");
+    }
+
+    const handleEmojiRightClick = (event) => {
+      event.stopPropagation();
+      event.preventDefault(); // Prevent the default context menu from opening
+
+      setShowEmojiPicker(!showEmojiPicker);
+    };
+    const handleDeepLinkClick = (deepLinkMatch, event) => {
+      setSelectedConversation2(deepLinkMatch.replace("/", "")); // Add this line
+    };
+
+    // Check if the message starts with a slash command
+    // Check if the message starts with a slash command
+    const isSlashCommand = content.trim().startsWith("/");
+    const playButton = isSlashCommand ? (
+      <span className="play-button" onClick={() => sendMessage(content.trim())}>
+        ▶️
+      </span>
+    ) : null;
+
+    // Function to simulate sending a message
+    const sendMessage = async (messageText) => {
+      // Assuming there's a function in your context to send messages
+      // This is a placeholder function, replace it with your actual message sending logic
+      console.log("Sending message:", messageText);
+      await conversation.send(messageText);
+      // Example: yourMessageSendingFunction(messageText);
+    };
+
     return (
-      <div style={styles.messageContent}>
+      <div
+        style={styles.messageContent}
+        onContextMenu={(event) => handleEmojiRightClick(event)}>
+        {playButton}
         {showFrame && frameMetadata?.frameInfo && (
           <>
             {isLoading && (
@@ -210,8 +294,32 @@ export const MessageItem = ({ message, senderAddress, client }) => {
             />
           </>
         )}
-        <div style={styles.renderedMessage}>{content}</div>
+        <div
+          style={styles.renderedMessage}
+          dangerouslySetInnerHTML={{ __html: content }}></div>
+        {deepLinkMatch && (
+          <span
+            onClick={(event) => handleDeepLinkClick(deepLinkMatch, event)}
+            style={styles.deepLink}>
+            Go to conversation
+          </span>
+        )}
         {renderFooter(message.sent)}
+        {!deepLinkMatch && (
+          <div style={styles.ReactionAndReplyDiv}>
+            {reactions.map((emoji, index) => (
+              <span
+                key={index}
+                className="emoji-reaction"
+                onClick={() => handleEmojiPick(emoji)}
+                role="img"
+                aria-label={`emoji-reaction-${index}`}>
+                {emoji === "degen" ? <Degen /> : emoji}
+              </span>
+            ))}
+            {showEmojiPicker && <EmojiPicker onSelect={handleSelect} />}
+          </div>
+        )}
       </div>
     );
   };

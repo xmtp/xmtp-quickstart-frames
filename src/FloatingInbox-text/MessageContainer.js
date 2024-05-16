@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageInput } from "./MessageInput";
 import { MessageItem } from "./MessageItem";
-
+import { ContentTypeReaction } from "@xmtp/content-type-reaction";
 export const MessageContainer = ({
   conversation,
   client,
   searchTerm,
   isContained = false,
   selectConversation,
+  setSelectedConversation,
+  setSelectedConversation2,
   isConsent = false,
   isFullScreen = false,
 }) => {
@@ -88,6 +90,24 @@ export const MessageContainer = ({
   };
 
   const updateMessages = (prevMessages, newMessage) => {
+    if (newMessage.contentType.sameAs(ContentTypeReaction)) {
+      const originalMessageId = newMessage.content.reference;
+      return prevMessages.map((m) => {
+        if (m.id === originalMessageId) {
+          if (!m.reactions) {
+            m.reactions = new Set();
+          }
+          if (newMessage.content.action === "added") {
+            m.reactions.add(newMessage.content.content);
+          } else if (newMessage.content.action === "removed") {
+            m.reactions.delete(newMessage.content.content);
+          }
+          m.reactions = new Set(m.reactions);
+        }
+        return m;
+      });
+    }
+
     const doesMessageExist = prevMessages.some(
       (existingMessage) => existingMessage.id === newMessage.id,
     );
@@ -193,6 +213,34 @@ export const MessageContainer = ({
     }
   };
 
+  const [replyingToMessage, setReplyingToMessage] = useState(null);
+  const handleReply = async (originalMessage) => {
+    setReplyingToMessage(originalMessage);
+  };
+
+  const handleReaction = async (message, emoji) => {
+    const existingReaction = Array.from(message.reactions || []).find(
+      (r) => r === emoji,
+    );
+    const action = existingReaction ? "removed" : "added";
+
+    const reaction = {
+      reference: message.id,
+      schema: "unicode",
+      action: action,
+      content: emoji,
+    };
+
+    await conversation.send(reaction, {
+      contentType: ContentTypeReaction,
+    });
+  };
+
+  const handleDeepLinkClick = (conv) => {
+    console.log("setSelectedConversation2", conv);
+    setSelectedConversation2(conv);
+  };
+
   return (
     <div style={styles.messagesContainer}>
       {isLoading ? (
@@ -233,7 +281,11 @@ export const MessageContainer = ({
                   key={message.id}
                   message={message}
                   senderAddress={message.senderAddress}
+                  onReaction={handleReaction}
+                  messageReactions={Array.from(message.reactions ?? [])}
                   client={client}
+                  conversation={conversation}
+                  setSelectedConversation2={handleDeepLinkClick}
                 />
               );
             })}

@@ -24,10 +24,11 @@ export const ListConversations = ({
   const [activeTab, setActiveTab] = useState("allowed"); // Added state for active tab
 
   const hightlightConversation = (conversation) => {
+    console.log("Selecting conversation:", conversation);
     selectConversation(conversation);
     setSelectedConversation(conversation.peerAddress);
     if (conversation.peerAddress) {
-      console.log("Navigating to conversation:", conversation.consentState);
+      console.log("Navigating to conversation:", conversation.peerAddress);
       navigate(`/dm/${conversation.peerAddress}`, {});
       if (isConsent && conversation.consentState !== "allowed") {
         setActiveTab("requests");
@@ -176,12 +177,14 @@ export const ListConversations = ({
   }, [conversations]);
 
   useEffect(() => {
+    console.log("Selected conversation:", selectedConversation);
     if (selectedConversation) {
       navigate(`/dm/${selectedConversation}`, {});
     }
   }, [selectedConversation, navigate]);
 
   useEffect(() => {
+    console.log("Selected conversation:", selectedConversation);
     const path = window.location.pathname;
     const match = path.match(/\/dm\/(0x[a-fA-F0-9]{40})/); // Adjust regex as needed
     if (match) {
@@ -229,13 +232,6 @@ export const ListConversations = ({
 
         setAllowedConversations(allowedConversations);
         setRequestConversations(requestConversations);
-
-        console.log(
-          "allowed",
-          allowedConversations.length,
-          "requests",
-          requestConversations.length,
-        );
       }
     };
 
@@ -253,9 +249,12 @@ export const ListConversations = ({
     }
     return conversations.map((conversation, index) => {
       // Find the last message for this conversation by ID
-      const lastMessage =
+      let lastMessageContent =
         lastMessages.find((msg) => msg.topic === conversation.topic)?.content ||
         "...";
+      if (lastMessageContent.content) {
+        lastMessageContent = lastMessageContent.content;
+      }
 
       return (
         <li
@@ -280,7 +279,7 @@ export const ListConversations = ({
                   conversation.peerAddress.length - 5,
                 )}
             </span>
-            <span style={styles.messagePreview}>{lastMessage}</span>
+            <span style={styles.messagePreview}>{lastMessageContent}</span>
           </div>
           <div style={styles.conversationTimestamp}>
             {getRelativeTimeLabel(conversation.createdAt)}

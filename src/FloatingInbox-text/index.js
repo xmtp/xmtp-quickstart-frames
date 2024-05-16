@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { ConversationContainer } from "./ConversationContainer";
 import { MessageContainer } from "./MessageContainer";
 import { useNavigate } from "react-router-dom";
+import { ReactionCodec } from "@xmtp/content-type-reaction";
 
 export function FloatingInbox({
   wallet,
@@ -321,11 +322,19 @@ export function FloatingInbox({
         ...clientOptions,
         privateKeyOverride: keys,
       });
+
+      xmtp.registerCodec(new ReactionCodec());
       setClient(xmtp);
       setIsOnNetwork(!!xmtp.address);
     } catch (e) {
       console.log(e);
     }
+  };
+
+  const handleDeepLinkClick = async (conversation) => {
+    console.log("setSelectedConversation2 index", conversation);
+    const conv = await client.conversations.newConversation(conversation);
+    setSelectedConversation(conv);
   };
   return (
     <>
@@ -479,6 +488,8 @@ export function FloatingInbox({
                       searchTerm={""}
                       isConsent={isConsent}
                       selectConversation={selectedConversation}
+                      setSelectedConversation={setSelectedConversation}
+                      setSelectedConversation2={handleDeepLinkClick}
                     />
                   )}
                 </div>
