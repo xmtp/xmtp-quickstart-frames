@@ -249,15 +249,16 @@ export const ListConversations = ({
     return conversations.map((conversation, index) => {
       let lastMessageContent = "";
       try {
-        lastMessageContent =
+        let test =
           lastMessages.find((msg) => msg.topic === conversation.topic)
             ?.content || "...";
-        if (lastMessageContent.content) {
-          lastMessageContent = lastMessageContent.content;
+        if (test.content) {
+          test = test.content;
+          if (test.emoji) {
+            test = lastMessageContent.content;
+          }
         }
-        if (lastMessageContent.content) {
-          lastMessageContent = lastMessageContent.content;
-        }
+        lastMessageContent = test;
       } catch (error) {
         console.error("Failed to fetch last message:", error);
       }
@@ -285,7 +286,7 @@ export const ListConversations = ({
                   conversation.peerAddress.length - 5,
                 )}
             </span>
-            {/* <span style={styles.messagePreview}>{lastMessageContent}</span> */}
+            <span style={styles.messagePreview}>{lastMessageContent}</span>
           </div>
           <div style={styles.conversationTimestamp}>
             {getRelativeTimeLabel(conversation.createdAt)}
