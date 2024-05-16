@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, act } from "react";
 import { MessageInput } from "./MessageInput";
 import { MessageItem } from "./MessageItem";
 import { ContentTypeReaction } from "@xmtp/content-type-reaction";
@@ -92,17 +92,24 @@ export const MessageContainer = ({
   const updateMessages = (prevMessages, newMessage) => {
     if (newMessage.contentType.sameAs(ContentTypeReaction)) {
       const originalMessageId = newMessage.content.reference;
+      const emoji = newMessage.content.content.emoji;
+      const action = newMessage.content.action;
+      //degen
       return prevMessages.map((m) => {
         if (m.id === originalMessageId) {
-          if (!m.reactions) {
-            m.reactions = new Set();
+          const newReactions = new Set(m.reactions);
+          const emojiSet = new Set();
+          newReactions.forEach((reaction) => {
+            if (typeof reaction === "string") {
+              emojiSet.add(reaction.emoji);
+            }
+          });
+          if (action === "added") {
+            newReactions.add(emoji);
+          } else if (action === "removed") {
+            newReactions.delete(emoji);
           }
-          if (newMessage.content.action === "added") {
-            m.reactions.add(newMessage.content.content);
-          } else if (newMessage.content.action === "removed") {
-            m.reactions.delete(newMessage.content.content);
-          }
-          m.reactions = new Set(m.reactions);
+          return { ...m, reactions: newReactions };
         }
         return m;
       });
@@ -118,7 +125,6 @@ export const MessageContainer = ({
 
     return prevMessages;
   };
-
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -219,16 +225,23 @@ export const MessageContainer = ({
   };
 
   const handleReaction = async (message, emoji) => {
+    //degen
+    if (emoji.props?.emojiType) emoji = emoji.props.emojiType;
+
     const existingReaction = Array.from(message.reactions || []).find(
       (r) => r === emoji,
     );
     const action = existingReaction ? "removed" : "added";
 
     const reaction = {
+      //degen
       reference: message.id,
       schema: "unicode",
       action: action,
-      content: emoji,
+      content: {
+        emoji: emoji,
+        receiverAddress: conversation.peerAddress,
+      },
     };
 
     await conversation.send(reaction, {
@@ -237,7 +250,6 @@ export const MessageContainer = ({
   };
 
   const handleDeepLinkClick = (conv) => {
-    console.log("setSelectedConversation2", conv);
     setSelectedConversation2(conv);
   };
 

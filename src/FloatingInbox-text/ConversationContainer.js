@@ -196,7 +196,6 @@ export const ConversationContainer = ({
   }
 
   const handleDeepLinkClick = (conversation) => {
-    console.log("handleDeepLinkClick pepe", conversation);
     setSelectedConversation(conversation);
   };
   const renderListConversations = () => {

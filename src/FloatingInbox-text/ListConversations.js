@@ -24,11 +24,9 @@ export const ListConversations = ({
   const [activeTab, setActiveTab] = useState("allowed"); // Added state for active tab
 
   const hightlightConversation = (conversation) => {
-    console.log("Selecting conversation:", conversation);
     selectConversation(conversation);
     setSelectedConversation(conversation.peerAddress);
     if (conversation.peerAddress) {
-      console.log("Navigating to conversation:", conversation.peerAddress);
       navigate(`/dm/${conversation.peerAddress}`, {});
       if (isConsent && conversation.consentState !== "allowed") {
         setActiveTab("requests");
@@ -115,7 +113,6 @@ export const ListConversations = ({
 
       stream = await client.conversations.stream();
       for await (const conversation of stream) {
-        console.log("New conversation:", conversation.consentState);
         //Need to fix this manually
         if (conversation.client?.address === client.address)
           await client.contacts.allow([conversation.peerAddress]);
@@ -155,14 +152,18 @@ export const ListConversations = ({
 
         for (const conversation of conversations) {
           const conversationMessages = await conversation.messages();
-          const lastMessage =
-            conversationMessages[conversationMessages.length - 1];
-          const content = lastMessage?.content;
+          let lastMessage = "";
+          try {
+            lastMessage = conversationMessages[conversationMessages.length - 1];
+            lastMessage = lastMessage?.content;
+          } catch (error) {
+            console.error("Failed to fetch last message:", error);
+          }
 
           // Store objects with conversation ID and last message content
           messages.push({
             topic: conversation.topic, // Assuming each conversation has a unique 'id' field
-            content: content,
+            content: lastMessage,
           });
         }
         setLastMessages(messages);
@@ -177,14 +178,12 @@ export const ListConversations = ({
   }, [conversations]);
 
   useEffect(() => {
-    console.log("Selected conversation:", selectedConversation);
     if (selectedConversation) {
       navigate(`/dm/${selectedConversation}`, {});
     }
   }, [selectedConversation, navigate]);
 
   useEffect(() => {
-    console.log("Selected conversation:", selectedConversation);
     const path = window.location.pathname;
     const match = path.match(/\/dm\/(0x[a-fA-F0-9]{40})/); // Adjust regex as needed
     if (match) {
@@ -248,12 +247,19 @@ export const ListConversations = ({
       );
     }
     return conversations.map((conversation, index) => {
-      // Find the last message for this conversation by ID
-      let lastMessageContent =
-        lastMessages.find((msg) => msg.topic === conversation.topic)?.content ||
-        "...";
-      if (lastMessageContent.content) {
-        lastMessageContent = lastMessageContent.content;
+      let lastMessageContent = "";
+      try {
+        lastMessageContent =
+          lastMessages.find((msg) => msg.topic === conversation.topic)
+            ?.content || "...";
+        if (lastMessageContent.content) {
+          lastMessageContent = lastMessageContent.content;
+        }
+        if (lastMessageContent.content) {
+          lastMessageContent = lastMessageContent.content;
+        }
+      } catch (error) {
+        console.error("Failed to fetch last message:", error);
       }
 
       return (
@@ -279,7 +285,7 @@ export const ListConversations = ({
                   conversation.peerAddress.length - 5,
                 )}
             </span>
-            <span style={styles.messagePreview}>{lastMessageContent}</span>
+            {/* <span style={styles.messagePreview}>{lastMessageContent}</span> */}
           </div>
           <div style={styles.conversationTimestamp}>
             {getRelativeTimeLabel(conversation.createdAt)}

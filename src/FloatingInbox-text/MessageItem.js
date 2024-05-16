@@ -83,20 +83,23 @@ export const MessageItem = ({
   };
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const handleEmojiPick = (emoji) => {
+  const handleEmojiPick = (emojiData) => {
+    let emoji = emojiData.emoji; // Access the emoji from the object
+    if (emojiData.emoji?.props?.emojiType) emoji = emoji.props.emojiType;
+
+    const receiverAddress = emojiData.receiverAddress || "";
     if (emoji) {
       setReactions((prevReactions) => {
-        if (prevReactions.includes(emoji)) {
-          return prevReactions.filter((r) => r !== emoji);
+        const existingEmoji = prevReactions.find((r) => r.emoji === emoji);
+        if (existingEmoji) {
+          return prevReactions.filter((r) => r.emoji !== emoji);
         }
-        return [...prevReactions, emoji];
+        return [...prevReactions, emojiData]; // Store the entire object
       });
-
-      onReaction(message, emoji);
+      onReaction(message, emoji, receiverAddress); // Pass receiverAddress if needed in onReaction
     }
     setShowEmojiPicker(false);
   };
-
   function onTextInputChange(event) {
     setTextInputValue(event.target.value);
   }
@@ -133,7 +136,6 @@ export const MessageItem = ({
             ...payload,
           },
         );
-        console.log("Transaction info", transactionInfo);
         const address = transactionInfo.params.to;
 
         try {
@@ -251,7 +253,6 @@ export const MessageItem = ({
     };
 
     // Check if the message starts with a slash command
-    // Check if the message starts with a slash command
     const isSlashCommand = content.trim().startsWith("/");
     const playButton = isSlashCommand ? (
       <span className="play-button" onClick={() => sendMessage(content.trim())}>
@@ -261,11 +262,15 @@ export const MessageItem = ({
 
     // Function to simulate sending a message
     const sendMessage = async (messageText) => {
-      // Assuming there's a function in your context to send messages
-      // This is a placeholder function, replace it with your actual message sending logic
-      console.log("Sending message:", messageText);
       await conversation.send(messageText);
-      // Example: yourMessageSendingFunction(messageText);
+    };
+    const renderEmoji = (emojiData) => {
+      //degen
+      if (emojiData.emoji === "degen") {
+        return <Degen />;
+      } else {
+        return emojiData.emoji;
+      }
     };
 
     return (
@@ -314,7 +319,7 @@ export const MessageItem = ({
                 onClick={() => handleEmojiPick(emoji)}
                 role="img"
                 aria-label={`emoji-reaction-${index}`}>
-                {emoji === "degen" ? <Degen /> : emoji}
+                {renderEmoji(emoji)}
               </span>
             ))}
             {showEmojiPicker && <EmojiPicker onSelect={handleSelect} />}

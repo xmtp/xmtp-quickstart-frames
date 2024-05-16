@@ -332,7 +332,6 @@ export function FloatingInbox({
   };
 
   const handleDeepLinkClick = async (conversation) => {
-    console.log("setSelectedConversation2 index", conversation);
     const conv = await client.conversations.newConversation(conversation);
     setSelectedConversation(conv);
   };

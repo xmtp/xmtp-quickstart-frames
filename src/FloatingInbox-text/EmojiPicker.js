@@ -1,11 +1,13 @@
 import React, { useRef, useEffect } from "react";
 import { ReactComponent as Degen } from "./DegenEmoji.svg"; // Import your custom SVG
 const emojis = [
-  "❤️",
-  "😍",
-  "💪🏻",
-  "🫡",
-  <Degen emojiType="degen" style={{ width: "12px", height: "12px" }} />,
+  { emoji: "❤️" },
+  { emoji: "💩" },
+  {
+    emoji: (
+      <Degen emojiType="degen" style={{ width: "12px", height: "12px" }} />
+    ),
+  },
 ]; // Add the SVG as a React component
 
 export const EmojiPicker = ({ onSelect }) => {
@@ -43,26 +45,32 @@ export const EmojiPicker = ({ onSelect }) => {
     };
   }, [onSelect]);
 
+  const handleSelectEmoji = (emojiData) => {
+    //degen
+    if (emojiData.emoji.props && emojiData.emoji.props.emojiType === "degen") {
+      onSelect({
+        emoji: emojiData.emoji.props.emojiType,
+      });
+    } else {
+      onSelect(emojiData);
+    }
+  };
   return (
     <div style={styles.EmojiPickerContainer} ref={pickerRef}>
       <span style={styles.ReplyButton} onClick={() => onSelect("reply")}>
         Reply
       </span>
-      {emojis.map((emoji, index) => (
+      {emojis.map((emojiData, index) => (
         <span
           style={styles.EmojiItem}
           key={index}
-          onClick={() => {
-            // Check if the emoji has the emojiType prop and if it's "degen"
-            const emojiType = emoji.props && emoji.props.emojiType;
-            onSelect(emojiType ? emojiType : emoji);
-          }}
+          onClick={() => handleSelectEmoji(emojiData)}
           role="img"
           className="emoji"
           aria-label={`emoji-${index}`}>
-          {typeof emoji === "string"
-            ? emoji
-            : React.cloneElement(emoji, { style: styles.EmojiItem })}
+          {typeof emojiData.emoji === "string"
+            ? emojiData.emoji
+            : React.cloneElement(emojiData.emoji, { style: styles.EmojiItem })}
         </span>
       ))}
     </div>
