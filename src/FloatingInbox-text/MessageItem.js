@@ -111,6 +111,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
             account: client.address,
             to: address,
             value: transactionInfo.params.value, // 1 as bigint
+            data: transactionInfo.params.data,
           });
 
           const buttonPostUrl =
