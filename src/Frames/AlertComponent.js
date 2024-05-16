@@ -20,7 +20,7 @@ const AlertComponent = ({ show, onClose, message }) => {
       fontSize: "10px",
       textAlign: "left",
       width: "100%",
-      marginBottom: "10px", // Added margin for spacing between the message and the button
+      marginBottom: "10px",
       display: "block",
     },
     desc: {
@@ -39,7 +39,7 @@ const AlertComponent = ({ show, onClose, message }) => {
       border: "none",
       padding: "5px",
       borderRadius: "5px",
-      margin: " 0", // Added margin for spacing between buttons
+      margin: " 0", //  margin for spacing between buttons
     },
   };
 

@@ -97,7 +97,7 @@ export const ListConversations = ({
       setLoading(true);
       if (isConsent) {
         //Refresh consent
-        console.log("Refreshing consent list");
+        //console.log("Refreshing consent list");
         await client.contacts.refreshConsentList();
       }
       const allConversations = await client.conversations.list();

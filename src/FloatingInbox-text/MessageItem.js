@@ -31,8 +31,8 @@ export const MessageItem = ({
   const [frameMetadata, setFrameMetadata] = useState();
   const [frameButtonUpdating, setFrameButtonUpdating] = useState(0);
   const [textInputValue, setTextInputValue] = useState("");
-  const [reactions, setReactions] = useState(messageReactions || []);
-
+  const [reactions, setReactions] = useState(Array.from(messageReactions));
+  console.log("reactions", reactions);
   const styles = {
     messageContent: {
       backgroundColor: "rgb(79 70 229)",
@@ -83,18 +83,19 @@ export const MessageItem = ({
   };
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const handleEmojiPick = (emojiData) => {
-    let emoji = emojiData.emoji; // Access the emoji from the object
-    if (emojiData.emoji?.props?.emojiType) emoji = emoji.props.emojiType;
-
-    const receiverAddress = emojiData.receiverAddress || "";
+  const handleEmojiPick = (emoji) => {
+    //degen
+    if (emoji.emoji) emoji = emoji.emoji; // Access the emoji from the object
+    if (emoji.emoji?.props?.emojiType) emoji = emoji.props.emojiType;
+    console.log("degen", emoji);
+    const receiverAddress = emoji.receiverAddress || "";
     if (emoji) {
       setReactions((prevReactions) => {
         const existingEmoji = prevReactions.find((r) => r.emoji === emoji);
         if (existingEmoji) {
           return prevReactions.filter((r) => r.emoji !== emoji);
         }
-        return [...prevReactions, emojiData]; // Store the entire object
+        return [...prevReactions, emoji]; // Store the entire object
       });
       onReaction(message, emoji, receiverAddress); // Pass receiverAddress if needed in onReaction
     }
@@ -266,10 +267,12 @@ export const MessageItem = ({
     };
     const renderEmoji = (emojiData) => {
       //degen
-      if (emojiData.emoji === "degen") {
+      console.log("emojiData", emojiData);
+      if (emojiData.emoji) emojiData = emojiData.emoji;
+      if (emojiData === "degen") {
         return <Degen />;
       } else {
-        return emojiData.emoji;
+        return emojiData;
       }
     };
 

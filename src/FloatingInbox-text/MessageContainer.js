@@ -94,22 +94,22 @@ export const MessageContainer = ({
       const originalMessageId = newMessage.content.reference;
       const emoji = newMessage.content.content.emoji;
       const action = newMessage.content.action;
-      //degen
+      console.log("reaction", emoji, action);
       return prevMessages.map((m) => {
         if (m.id === originalMessageId) {
-          const newReactions = new Set(m.reactions);
-          const emojiSet = new Set();
-          newReactions.forEach((reaction) => {
-            if (typeof reaction === "string") {
-              emojiSet.add(reaction.emoji);
-            }
-          });
+          let updatedReactions = new Set(m.reactions); // Create a new Set from existing reactions
+          console.log(
+            `Current reactions before update: ${Array.from(updatedReactions)}`,
+          );
           if (action === "added") {
-            newReactions.add(emoji);
+            updatedReactions.add(emoji);
           } else if (action === "removed") {
-            newReactions.delete(emoji);
+            updatedReactions.delete(emoji);
           }
-          return { ...m, reactions: newReactions };
+          console.log(
+            `Updated reactions after update: ${Array.from(updatedReactions)}`,
+          );
+          m.reactions = updatedReactions; // Assign the updated Set back
         }
         return m;
       });
@@ -120,11 +120,13 @@ export const MessageContainer = ({
     );
 
     if (!doesMessageExist) {
+      newMessage.reactions = new Set(); // Initialize reactions as a Set
       return [...prevMessages, newMessage];
     }
 
     return prevMessages;
   };
+
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -134,10 +136,10 @@ export const MessageContainer = ({
           const initialMessages = await conversation?.messages();
 
           let updatedMessages = [];
-          initialMessages.forEach((message) => {
-            updatedMessages = updateMessages(updatedMessages, message);
-          });
-
+          // Wait for this to finish
+          for (const message of initialMessages) {
+            updatedMessages = await updateMessages(updatedMessages, message);
+          }
           setMessages(updatedMessages);
           setIsLoading(false);
         }
@@ -227,12 +229,13 @@ export const MessageContainer = ({
   const handleReaction = async (message, emoji) => {
     //degen
     if (emoji.props?.emojiType) emoji = emoji.props.emojiType;
+    // console.log("degen", emoji);
 
     const existingReaction = Array.from(message.reactions || []).find(
       (r) => r === emoji,
     );
     const action = existingReaction ? "removed" : "added";
-
+    console.log(action);
     const reaction = {
       //degen
       reference: message.id,
@@ -294,7 +297,7 @@ export const MessageContainer = ({
                   message={message}
                   senderAddress={message.senderAddress}
                   onReaction={handleReaction}
-                  messageReactions={Array.from(message.reactions ?? [])}
+                  messageReactions={message.reactions ?? []}
                   client={client}
                   conversation={conversation}
                   setSelectedConversation2={handleDeepLinkClick}

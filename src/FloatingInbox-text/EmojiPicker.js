@@ -47,13 +47,12 @@ export const EmojiPicker = ({ onSelect }) => {
 
   const handleSelectEmoji = (emojiData) => {
     //degen
-    if (emojiData.emoji.props && emojiData.emoji.props.emojiType === "degen") {
-      onSelect({
-        emoji: emojiData.emoji.props.emojiType,
-      });
-    } else {
-      onSelect(emojiData);
+    // console.log("degen", emojiData);
+    if (emojiData.emoji?.props?.emojiType) {
+      emojiData = emojiData.emoji.props.emojiType;
     }
+
+    onSelect(emojiData);
   };
   return (
     <div style={styles.EmojiPickerContainer} ref={pickerRef}>
