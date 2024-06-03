@@ -6,11 +6,16 @@ import {
   getOrderedButtons,
   isXmtpFrame,
 } from "../Frames/FrameInfo";
-import { createWalletClient, custom, parseEther } from "viem";
+import { createWalletClient, custom } from "viem";
 import { sepolia } from "viem/chains";
 
 import { FramesClient } from "@xmtp/frames-client";
 import { fetchFrameFromUrl } from "../Frames/utils"; // Ensure you have this helper or implement it
+
+const walletClient = createWalletClient({
+  chain: sepolia,
+  transport: custom(window.ethereum),
+});
 
 export const MessageItem = ({ message, senderAddress, client }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -94,38 +99,57 @@ export const MessageItem = ({ message, senderAddress, client }) => {
       if (action === "tx") {
         const transactionInfo = await framesClient.proxy.postTransaction(
           button.target,
-          {
-            ...payload,
-          },
+          payload,
         );
         console.log("Transaction info", transactionInfo);
-        const address = transactionInfo.params.to;
 
-        try {
-          const walletClient = createWalletClient({
-            chain: sepolia,
-            transport: custom(window.ethereum),
+        if (transactionInfo.method === "eth_personalSign") {
+          const { value } = transactionInfo.params;
+          const signature = await walletClient.signMessage({
+            account: client,
+            message: value,
           });
 
-          const hash = await walletClient.sendTransaction({
-            account: client.address,
-            to: address,
-            value: transactionInfo.params.value, // 1 as bigint
-            data: transactionInfo.params.data,
+          const payloadWithTxId = await framesClient.signFrameAction({
+            frameUrl,
+            inputText: textInputValue || undefined,
+            buttonIndex,
+            conversationTopic,
+            participantAccountAddresses: [senderAddress, client.address],
+            address: client.address,
+            state: frameInfo.state,
+            transactionId: signature,
           });
 
-          const buttonPostUrl =
-            frameMetadata.extractedTags["fc:frame:button:1:post_url"];
           const completeTransactionMetadata = await framesClient.proxy.post(
-            buttonPostUrl,
-            {
-              ...payload,
-              transactionId: hash,
-            },
+            button.postUrl,
+            payloadWithTxId,
           );
           setFrameMetadata(completeTransactionMetadata);
-        } catch (e) {
-          console.log("Transaction error", e);
+        } else {
+          const address = transactionInfo.params.to;
+
+          try {
+            const hash = await walletClient.sendTransaction({
+              account: client.address,
+              to: address,
+              value: transactionInfo.params.value, // 1 as bigint
+              data: transactionInfo.params.data,
+            });
+
+            const buttonPostUrl =
+              frameMetadata.extractedTags["fc:frame:button:1:post_url"];
+            const completeTransactionMetadata = await framesClient.proxy.post(
+              buttonPostUrl,
+              {
+                ...payload,
+                transactionId: hash,
+              },
+            );
+            setFrameMetadata(completeTransactionMetadata);
+          } catch (e) {
+            console.log("Transaction error", e);
+          }
         }
       } else if (action === "post") {
         const updatedFrameMetadata = await framesClient.proxy.post(
