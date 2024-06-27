@@ -1,4 +1,4 @@
-# XMTP Dev Inbox
+# XMTP Quickstart Frames
 
 Web client intended to be used by hackathon developers. Feel free to fork or clone this repo and fit it to your project!
 
