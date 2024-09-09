@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Client } from "@xmtp/xmtp-js";
+import { ReplyCodec } from "@xmtp/content-type-reply";
 import { ethers } from "ethers";
 import { ConversationContainer } from "./ConversationContainer";
 import { MessageContainer } from "./MessageContainer";
@@ -321,6 +322,7 @@ export function FloatingInbox({
         ...clientOptions,
         privateKeyOverride: keys,
       });
+      xmtp.registerCodec(new ReplyCodec());
       setClient(xmtp);
       setIsOnNetwork(!!xmtp.address);
     } catch (e) {

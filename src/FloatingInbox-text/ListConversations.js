@@ -24,11 +24,13 @@ export const ListConversations = ({
   const [activeTab, setActiveTab] = useState("allowed"); // Added state for active tab
 
   const hightlightConversation = (conversation) => {
-    selectConversation(conversation);
-    setSelectedConversation(conversation.peerAddress);
-    if (conversation.peerAddress) {
+    if (conversation && conversation.peerAddress) {
+      selectConversation(conversation);
+      setSelectedConversation(conversation.peerAddress);
+
       console.log("Navigating to conversation:", conversation.consentState);
       navigate(`/dm/${conversation.peerAddress}`, {});
+
       if (isConsent && conversation.consentState !== "allowed") {
         setActiveTab("requests");
       }
