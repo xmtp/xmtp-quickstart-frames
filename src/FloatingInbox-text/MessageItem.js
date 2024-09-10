@@ -204,14 +204,22 @@ export const MessageItem = ({ message, senderAddress, client }) => {
     const codec = client.codecFor(message.contentType);
     let content = message.content;
 
-    if (frameMetadata?.url && showFrame)
-      content = content.replace(frameMetadata?.url, "");
+    // Handle 'reply' content type by accessing message.content.content
+    if (message.contentType === "reply") {
+      content = message.content.content;
+    }
+    if (frameMetadata?.url && showFrame) {
+      content = content.replace(frameMetadata.url, "");
+    }
+
     if (!codec) {
       /*Not supported content type*/
       if (message?.contentFallback !== undefined)
         content = message?.contentFallback;
       else return;
     }
+
+    // Render the content safely
     return (
       <div style={styles.messageContent}>
         {showFrame && frameMetadata?.frameInfo && (
@@ -220,7 +228,7 @@ export const MessageItem = ({ message, senderAddress, client }) => {
               <div style={styles.renderedMessage}>{"Loading..."}</div>
             )}
             <Frame
-              image={frameMetadata?.frameInfo?.image.content}
+              image={frameMetadata?.frameInfo?.image?.content}
               title={getFrameTitle(frameMetadata)}
               buttons={getOrderedButtons(frameMetadata)}
               handleClick={handleFrameButtonClick}
@@ -235,11 +243,15 @@ export const MessageItem = ({ message, senderAddress, client }) => {
             />
           </>
         )}
-        <div style={styles.renderedMessage}>{content}</div>
+        {/* Ensure content is rendered safely */}
+        <div style={styles.renderedMessage}>
+          {typeof content === "string" ? content : content.content}
+        </div>
         {renderFooter(message.sent)}
       </div>
     );
   };
+
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const isSender = senderAddress === client?.address;
